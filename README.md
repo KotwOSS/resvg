@@ -18,8 +18,8 @@ This project is licensed under the [Mit License](https://mit-license.org/)
 
 ## Features
 
-1. <a href="examples/repeat/doc">Loops</a>
-2. <a href="examples/if/doc">Conditions</a>
+1. [Loops](examples/repeat/doc)
+2. [Conditions](examples/if/doc)
 
 <hr>
 <br>
