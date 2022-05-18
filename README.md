@@ -18,9 +18,9 @@ This project is licensed under the [Mit License](https://mit-license.org/)
 
 ## Features
 
-1. [Loops](examples/repeat/doc)
-2. [Conditions](examples/if/doc)
-3. [Variables](examples/define/doc)
+1. [Loops](examples/repeat/doc.md)
+2. [Conditions](examples/if/doc.md)
+3. [Variables](examples/define/doc.md)
 
 <hr>
 <br>
