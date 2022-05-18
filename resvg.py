@@ -168,7 +168,7 @@ def cmd_version():
     print(version)
 
 
-operand = require_arg_or(1, help)
+operand = require_arg_or(1, cmd_help)
 operands = {
     "compile": cmd_compile,
     "help": cmd_help,
