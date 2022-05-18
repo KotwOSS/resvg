@@ -3,7 +3,7 @@
 ## Examples
 ```xml
 <repeat var="i" range="0;100;10">
-    <rect x="{i}" y="0" width="5" height="5">
+    <rect x="{i}" y="0" width="5" height="5" />
 </repeat>
 ```
 
