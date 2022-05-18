@@ -24,24 +24,24 @@ year = 2022
 red = "\033[38;2;255;100;100m"
 blue = "\033[38;2;100;100;255m"
 orange = "\033[38;2;255;150;0m"
-yellow = "\033[38;2;255;255;0m"
+yellow = "\033[38;2;255;205;50m"
 reset = "\033[0m"
 
 
 import sys, re
 from xml.dom import minidom
+from time import time
 
 # Transform nodes
 class NodeTransform:
     expression_regex = re.compile("{([a-zA-Z0-9.*/+-^()]+)}")
+    expression_vars_regex = re.compile("([a-zA-Z]+)")
     vars = {}
 
     def __init__(self, root):
         self.root = root
 
-    def repeat(self, node):
-        parent = node.parentNode
-
+    def repeat(self, node, parent, before):
         range = node.getAttribute("range").strip()
         var = node.getAttribute("var").strip()
         start, end, step = range.split(";")
@@ -55,17 +55,37 @@ class NodeTransform:
         self.vars[var] = start
         while (self.vars[var] <= end if drc else self.vars[var] >= end):
             for child in list(node.childNodes):
-                cloned = child.cloneNode(True)
-                self.transform_node(cloned)
+                clone = child.cloneNode(True)
+                transformed = self.transform_node(clone, parent, node)
 
-                parent.insertBefore(cloned, node)
+                if transformed:
+                    parent.insertBefore(transformed, before if before else node)
 
             self.vars[var] += step
         
-        parent.removeChild(node)
+        if not before:
+            parent.removeChild(node)
+
+    def define(self, node, parent, before):
+        if node.hasAttributes():
+            attrs = node.attributes
+            for i in range(0, attrs.length):
+                attr = attrs.item(i)
+                var = attr.name
+                value = attr.value
+
+                if value.isnumeric():
+                    self.vars[var] = float(value)
+                else:
+                    self.vars[var] = value
+
+                print(f"{blue}DEFINED{reset} Variable {orange}'{var}'{reset} with value {orange}'{value}'{reset}")
+
+        if not before:
+            parent.removeChild(node)
 
 
-    def transform_node(self, node):
+    def transform_node(self, node, parent, before):
         if node.nodeType == node.TEXT_NODE:
             node.data = node.data.strip()
             return
@@ -85,21 +105,45 @@ class NodeTransform:
                     endidx = exp.end(0)
                     exp = exp.group(1)
 
-                    for (var, value) in self.vars.items():
-                        exp = exp.replace(var, str(value))
+                    exp_vars = self.expression_vars_regex.finditer(exp)
+
+                    exp_endidx = 0
+                    exp_txt = ""
+                    for var in exp_vars:
+                        exp_txt += exp[exp_endidx:var.start(0)]
+                        exp_endidx = var.end(0)
+                        var = var.group(1)
+
+                        if var in self.vars:
+                            exp_txt += str(self.vars[var])
+                        else:
+                            print(f"{red}NOT_FOUND{reset} Variable '{var}' not found! Inserting as text...")
+                            exp_txt += var
+
+                    exp_txt += exp[exp_endidx:]
                     
-                    txt += f"{eval(exp):10.3f}".strip()
+                    try:
+                        txt += f"{eval(exp_txt):10.3f}".strip()
+                    except Exception as e:
+                        print(f"Error while evaluating expression '{exp_txt}'! Inserting as text...")
+                        txt += exp_txt
 
                 attr.value = txt + val[endidx:]
 
         if node.nodeName == "repeat":
-            self.repeat(node)
+            self.repeat(node, parent, before)
+            return None
+        elif node.nodeName == "define":
+            self.define(node, parent, before)
+            return None
         elif node.hasChildNodes():
             for child in list(node.childNodes):
-                self.transform_node(child)
+                self.transform_node(child, parent, before)
+        
+        return node
 
     def transform(self):
-        self.transform_node(self.root)
+        self.transform_node(self.root, self.root, None)
 
 
 
@@ -121,6 +165,12 @@ def require_arg_or(index, func):
 
 
 def compile(src, dest):
+    print_logo()
+
+    print(f"{red}COMPILING{reset} {src} -> {dest}\n")
+
+    start = time()
+
     with open(src, "rb") as src:
         doc = minidom.parse(src)
 
@@ -136,15 +186,13 @@ def compile(src, dest):
 
         doc.unlink()
 
+    took = time() - start
+
+    print(f"\n{yellow}FINISHED{reset} Took {orange}{round(took * 1000)}ms{reset}")
+    print("")
 
 
-def cmd_compile():
-    src = require_arg("src", 2)
-    dest = require_arg("dest", 3)
-    compile(src, dest)
-
-
-def cmd_help():
+def print_logo():
     print(f"""{orange}
 ░█▀▀█ █▀▀ ░█▀▀▀█ ░█  ░█ ░█▀▀█ 
 ░█▄▄▀ █▀▀  ▀▀▀▄▄  ░█░█  ░█ ▄▄ 
@@ -156,6 +204,16 @@ def cmd_help():
     print("")
     print(f"{red}(c){reset} Copyright {year} {blue}{', '.join(authors)}{reset}")
     print("\n")
+
+
+def cmd_compile():
+    src = require_arg("src", 2)
+    dest = require_arg("dest", 3)
+    compile(src, dest)
+
+
+def cmd_help():
+    print_logo()
     print(f"{sys.argv[0]} {orange}help{reset}")
     print("\tShows this help.\n")
     print(f"{sys.argv[0]} {orange}compile{reset} <source> <destination>")

@@ -1,4 +1,4 @@
-# KekAccount
+# ReSVG
 ![](https://tokei.rs/b1/github/KotwOSS/resvg)
 ![](https://tokei.rs/b1/github/KotwOSS/resvg?category=blanks)
 ![](https://tokei.rs/b1/github/KotwOSS/resvg?category=code)
@@ -6,7 +6,7 @@
 ![](https://tokei.rs/b1/github/KotwOSS/resvg?category=files)
 <br>
 
-ReSVG is a advanced SVG compiler which includes many features written in [python](https://www.python.org/).
+ReSVG is a advanced SVG compiler which includes many features and is written in [python](https://www.python.org/).
 
 <br>
 
@@ -20,6 +20,7 @@ This project is licensed under the [Mit License](https://mit-license.org/)
 
 1. [Loops](examples/repeat/doc)
 2. [Conditions](examples/if/doc)
+3. [Variables](examples/define/doc)
 
 <hr>
 <br>
