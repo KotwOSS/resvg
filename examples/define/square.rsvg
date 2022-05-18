@@ -1,0 +1,11 @@
+<svg width="100" height="100">
+    <define width="100" height="100" />
+    <define xiter="10" yiter="10" />
+    <define rwidth="{width/xiter}" rheight="{height/yiter}" />
+    <define max="{width+height}" />
+    <repeat var="x" range="0;100;{rwidth}">
+        <repeat var="y" range="0;100;{rheight}">
+            <rect x="{x}" y="{y}" width="{rwidth}" height="{rheight}" fill="rgb({(x+y)/max*255}, {(width-x+y)/max*255}, {(x+height-y)/max*255})" />
+        </repeat>
+    </repeat>
+</svg>
