@@ -29,6 +29,7 @@ reset = "\033[0m"
 
 
 import sys, re
+from xml.parsers import expat
 from xml.dom import minidom
 from time import time
 
@@ -138,7 +139,7 @@ class NodeTransform:
             return None
         elif node.hasChildNodes():
             for child in list(node.childNodes):
-                self.transform_node(child, parent, before)
+                self.transform_node(child, node, before)
         
         return node
 
