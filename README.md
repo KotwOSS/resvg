@@ -12,7 +12,7 @@ Advance your SVG experience
 ![](https://tokei.rs/b1/github/KotwOSS/resvg?category=files)
 <br>
 
-ReSVG is a advanced SVG compiler which includes many features which is written in [python](https://www.python.org/).
+ReSVG is a advanced SVG compiler, which includes many features, and is written in [python](https://www.python.org/).
 
 <br>
 
