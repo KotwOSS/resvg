@@ -1,20 +1,20 @@
 #! /usr/bin/python3
 
-# ██████╗░███████╗░██████╗██╗░░░██╗░██████╗░
-# ██╔══██╗██╔════╝██╔════╝██║░░░██║██╔════╝░
-# ██████╔╝█████╗░░╚█████╗░╚██╗░██╔╝██║░░██╗░
-# ██╔══██╗██╔══╝░░░╚═══██╗░╚████╔╝░██║░░╚██╗
-# ██║░░██║███████╗██████╔╝░░╚██╔╝░░╚██████╔╝
-# ╚═╝░░╚═╝╚══════╝╚═════╝░░░░╚═╝░░░░╚═════╝░
+# ░█▀▀█ █▀▀ ░█▀▀▀█ ░█  ░█ ░█▀▀█ 
+# ░█▄▄▀ █▀▀  ▀▀▀▄▄  ░█░█  ░█ ▄▄ 
+# ░█ ░█ ▀▀▀ ░█▄▄▄█   ▀▄▀  ░█▄▄█
 #
 # ReSVG is a advanced SVG compiler which includes many features.
 #
 # It is licensed under the MIT license.
 #
 # (c) Copyright 2022 KotwOSS
+#
+# https://github.com/KotwOSS/ReSVG
 
 
-version = "0.0.0alpha0"
+# Details
+version = "0.0.0alpha1"
 authors = ["KotwOSS"]
 license = "MIT"
 year = 2022
@@ -30,6 +30,7 @@ reset = "\033[0m"
 bold = "\033[1m"
 
 
+# Import the required modules
 try:
     from argparse import HelpFormatter
     import sys, re
