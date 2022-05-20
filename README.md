@@ -1,4 +1,9 @@
-# ReSVG
+```
+░█▀▀█ █▀▀ ░█▀▀▀█ ░█  ░█ ░█▀▀█ 
+░█▄▄▀ █▀▀  ▀▀▀▄▄  ░█░█  ░█ ▄▄ 
+░█ ░█ ▀▀▀ ░█▄▄▄█   ▀▄▀  ░█▄▄█
+Advance your SVG experience
+```
 ![](https://tokei.rs/b1/github/KotwOSS/resvg)
 ![](https://tokei.rs/b1/github/KotwOSS/resvg?category=blanks)
 ![](https://tokei.rs/b1/github/KotwOSS/resvg?category=code)
@@ -6,7 +11,7 @@
 ![](https://tokei.rs/b1/github/KotwOSS/resvg?category=files)
 <br>
 
-ReSVG is a advanced SVG compiler which includes many features and is written in [python](https://www.python.org/).
+ReSVG is a advanced SVG compiler which includes many features which is written in [python](https://www.python.org/).
 
 <br>
 
@@ -40,20 +45,47 @@ sudo ln resvg.py /usr/bin/resvg
 
 ## Usage
 
-Show the help
+Show the help:
 ```sh
-resvg help
+resvg --help
 ```
 
-Show the version
+Show the version:
 ```sh
-resvg help
+resvg --version
 ```
 
 Compile a ReSVG file to a SVG file:
 ```sh
-resvg compile input.rsvg output.svg
+resvg --compile -i input.rsvg -o output.svg
 ```
+
+Compile a ReSVG file and print it inside of the terminal:
+```sh
+resvg --compile -i input.rsvg
+```
+
+Silent mode:
+```sh
+resvg --silent
+```
+
+Log to a file:
+```sh
+resvg --log myfile.log
+```
+
+Specify the logging level:
+```sh
+resvg --level [-1-3]
+```
+
+**Log Levels**<br>
+-1: Debug<br>
+0: Info<br>
+1: Warning<br>
+2: Error<br>
+3: Fatal<br>
 
 <hr>
 <br>
