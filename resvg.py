@@ -378,7 +378,7 @@ class help_formatter(HelpFormatter):
 # Main function
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Process some integers.", formatter_class=help_formatter
+        description="Process ReSVG files.", formatter_class=help_formatter
     )
 
     parser.add_argument("--log", dest="log", help="specify a log file", type=str)
