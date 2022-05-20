@@ -1,6 +1,7 @@
 # Repeat
 
 ## Examples
+
 ```xml
 <repeat i="0;100;10">
     <rect x="{i}" y="0" width="5" height="5" />

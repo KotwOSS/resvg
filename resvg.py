@@ -1,7 +1,7 @@
 #! /usr/bin/python3
 
-# ░█▀▀█ █▀▀ ░█▀▀▀█ ░█  ░█ ░█▀▀█ 
-# ░█▄▄▀ █▀▀  ▀▀▀▄▄  ░█░█  ░█ ▄▄ 
+# ░█▀▀█ █▀▀ ░█▀▀▀█ ░█  ░█ ░█▀▀█
+# ░█▄▄▀ █▀▀  ▀▀▀▄▄  ░█░█  ░█ ▄▄
 # ░█ ░█ ▀▀▀ ░█▄▄▄█   ▀▄▀  ░█▄▄█
 #
 # ReSVG is a advanced SVG compiler which includes many features.
@@ -60,6 +60,7 @@ colors_regex = re.compile("§[a-zA-Z]")
 def remove_colors(text):
     return colors_regex.sub("", text)
 
+
 # Format all the color codes in a string
 def format_colors(text):
     for key, value in colors.items():
@@ -86,20 +87,24 @@ class Logger:
         if self.level <= level:
             self.stream.write(message)
 
+
 # CombinedLogger to combine multiple loggers
 class CombinedLogger(Logger):
     def __init__(self, loggers):
         self.loggers = loggers
 
     def call(self, name, message):
-        return [ getattr(logger, name)(message) if logger else None for logger in self.loggers ]
-    
+        return [
+            getattr(logger, name)(message) if logger else None
+            for logger in self.loggers
+        ]
+
     def debug(self, message):
         return self.call("debug", message)
-    
+
     def info(self, message):
         return self.call("info", message)
-    
+
     def warning(self, message):
         return self.call("warning", message)
 
@@ -108,6 +113,7 @@ class CombinedLogger(Logger):
 
     def fatal(self, message):
         return self.call("fatal", message)
+
 
 # SimpleLogger for log files
 class SimpleLogger(Logger):
@@ -126,6 +132,7 @@ class SimpleLogger(Logger):
     def fatal(self, message):
         self.call(Logger.FATAL, f"[FATAL] {remove_colors(message)}\n")
 
+
 # PrettyLogger for stdout
 class PrettyLogger(Logger):
     def debug(self, message):
@@ -135,7 +142,9 @@ class PrettyLogger(Logger):
         self.call(Logger.INFO, f"{blue}{bold}INFO{reset} {format_colors(message)}\n")
 
     def warning(self, message):
-        self.call(Logger.WARNING, f"{yellow}{bold}WARNING{reset} {format_colors(message)}\n")
+        self.call(
+            Logger.WARNING, f"{yellow}{bold}WARNING{reset} {format_colors(message)}\n"
+        )
 
     def error(self, message):
         self.call(Logger.ERROR, f"{red}{bold}ERROR{reset} {format_colors(message)}\n")
@@ -173,7 +182,7 @@ class NodeTransform:
         endidx = 0
         txt = ""
         for var in exp_vars:
-            txt += exp[endidx:var.start(0)]
+            txt += exp[endidx : var.start(0)]
             endidx = var.end(0)
             var = var.group(1)
 
@@ -186,7 +195,7 @@ class NodeTransform:
                 txt += var
 
         txt += exp[endidx:]
-        
+
         try:
             return eval(txt)
         except Exception as e:
@@ -208,7 +217,7 @@ class NodeTransform:
             drc = start <= end
 
             self.vars[var] = start
-            while (self.vars[var] <= end if drc else self.vars[var] >= end):
+            while self.vars[var] <= end if drc else self.vars[var] >= end:
                 for child in list(node.childNodes):
                     clone = child.cloneNode(True)
                     transformed = self.transform_node(clone, parent, node)
@@ -219,7 +228,7 @@ class NodeTransform:
                 self.vars[var] += step
         else:
             logger.warning("Repeat component should have attributes! Skipping...")
-            
+
         if not before:
             parent.removeChild(node)
 
@@ -259,24 +268,22 @@ class NodeTransform:
                     if transformed:
                         parent.insertBefore(transformed, before if before else node)
         else:
-            logger.warning(f"If condition §o'{condition}'§R didn't return a boolean value! Ignoring...")
+            logger.warning(
+                f"If condition §o'{condition}'§R didn't return a boolean value! Ignoring..."
+            )
 
         if not before:
             parent.removeChild(node)
-    
+
     # The available components
-    components = {
-        "if": comp_if,
-        "repeat": comp_repeat,
-        "define": comp_define
-    }
+    components = {"if": comp_if, "repeat": comp_repeat, "define": comp_define}
 
     # Transform a node
     def transform_node(self, node, parent, before):
         if node.nodeType == node.TEXT_NODE:
             node.data = node.data.strip()
             return
-        
+
         if node.nodeType == node.COMMENT_NODE:
             if not before:
                 parent.removeChild(node)
@@ -293,7 +300,7 @@ class NodeTransform:
                 endidx = 0
                 txt = ""
                 for exp in res:
-                    txt += val[endidx:exp.start(0)]
+                    txt += val[endidx : exp.start(0)]
                     endidx = exp.end(0)
                     exp = exp.group(1)
 
@@ -306,7 +313,7 @@ class NodeTransform:
         elif node.hasChildNodes():
             for child in list(node.childNodes):
                 self.transform_node(child, node, before)
-        
+
         return node
 
     def transform(self):
@@ -320,7 +327,7 @@ def compile(src, dest):
     doc = minidom.parse(src)
 
     root = doc.documentElement
-    
+
     transformer = NodeTransform(root)
     transformer.transform()
 
@@ -333,14 +340,18 @@ def compile(src, dest):
 
 # Print the logo
 def print_logo():
-    print(f"""{orange}
+    print(
+        f"""{orange}
 ░█▀▀█ █▀▀ ░█▀▀▀█ ░█  ░█ ░█▀▀█ 
 ░█▄▄▀ █▀▀  ▀▀▀▄▄  ░█░█  ░█ ▄▄ 
 ░█ ░█ ▀▀▀ ░█▄▄▄█   ▀▄▀  ░█▄▄█
-    {reset}""")
+    {reset}"""
+    )
     print(f"ReSVG version {blue}{version}{reset}")
     print("\n")
-    print(f"Written by {blue}{', '.join(authors)}{reset} licensed under {blue}{license}{reset}.")
+    print(
+        f"Written by {blue}{', '.join(authors)}{reset} licensed under {blue}{license}{reset}."
+    )
     print("")
     print(f"{red}(c){reset} Copyright {year} {blue}{', '.join(authors)}{reset}")
     print("\n")
@@ -355,28 +366,45 @@ def cmd_version():
 class help_formatter(HelpFormatter):
     def format_help(self):
         print_logo()
-
-        return super().format_help()
+        return super().format_help() + "\n"
 
     def add_usage(self, usage, actions, groups, prefix=None):
         if usage is not SUPPRESS:
-            self.add_text(f"{blue}[USAGE]{reset} {self._format_usage(usage, actions, groups, '')}")
+            self.add_text(
+                f"{blue}[USAGE]{reset} {self._format_usage(usage, actions, groups, '')}"
+            )
 
 
 # Main function
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Process some integers.', formatter_class=help_formatter)
+    parser = argparse.ArgumentParser(
+        description="Process some integers.", formatter_class=help_formatter
+    )
 
     parser.add_argument("--log", dest="log", help="specify a log file", type=str)
 
-    parser.add_argument("--level", dest="level", help="specify a log level", type=int, default=0)
+    parser.add_argument(
+        "--level", dest="level", help="specify a log level", type=int, default=0
+    )
 
-    parser.add_argument("-s", "--silent", dest="silent", help="run in silent mode", action="store_true")
-    parser.add_argument("-c", "--compile", dest="compile", help="compile input file", action="store_true")
-    parser.add_argument("-v", "--version", dest="version", help="show the version", action="store_true")
+    parser.add_argument(
+        "-s", "--silent", dest="silent", help="run in silent mode", action="store_true"
+    )
+    parser.add_argument(
+        "-c",
+        "--compile",
+        dest="compile",
+        help="compile input file",
+        action="store_true",
+    )
+    parser.add_argument(
+        "-v", "--version", dest="version", help="show the version", action="store_true"
+    )
 
     parser.add_argument("-i", "--input", dest="input", help="the input file", type=str)
-    parser.add_argument("-o", "--output", dest="output", help="the output file", type=str)
+    parser.add_argument(
+        "-o", "--output", dest="output", help="the output file", type=str
+    )
 
     args = parser.parse_args()
 
@@ -404,8 +432,10 @@ if __name__ == "__main__":
         output_file = args.output
 
         output_stream = open(output_file, "w") if output_file else sys.stdout
-        
-        logger.info(f"Compiling §o'{input_file}'§R to §o'{output_file if output_file else 'stdout'}'§R")
+
+        logger.info(
+            f"Compiling §o'{input_file}'§R to §o'{output_file if output_file else 'stdout'}'§R"
+        )
 
         took = compile(input_file, output_stream)
 
