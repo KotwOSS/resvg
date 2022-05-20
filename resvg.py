@@ -29,6 +29,7 @@ gray = "\033[38;2;180;180;180m"
 reset = "\033[0m"
 bold = "\033[1m"
 
+
 try:
     from argparse import HelpFormatter
     import sys, re
@@ -54,9 +55,11 @@ colors = {
 
 colors_regex = re.compile("§[a-zA-Z]")
 
+# Remove all the color codes in a string
 def remove_colors(text):
     return colors_regex.sub("", text)
 
+# Format all the color codes in a string
 def format_colors(text):
     for key, value in colors.items():
         text = text.replace(key, value)
@@ -66,6 +69,7 @@ def format_colors(text):
 # Logging
 logger = None
 
+# Logger class
 class Logger:
     DEBUG = -1
     INFO = 0
@@ -81,6 +85,7 @@ class Logger:
         if self.level <= level:
             self.stream.write(message)
 
+# CombinedLogger to combine multiple loggers
 class CombinedLogger(Logger):
     def __init__(self, loggers):
         self.loggers = loggers
@@ -103,6 +108,7 @@ class CombinedLogger(Logger):
     def fatal(self, message):
         return self.call("fatal", message)
 
+# SimpleLogger for log files
 class SimpleLogger(Logger):
     def debug(self, message):
         self.call(Logger.DEBUG, f"[DEBUG] {remove_colors(message)}\n")
@@ -119,7 +125,8 @@ class SimpleLogger(Logger):
     def fatal(self, message):
         self.call(Logger.FATAL, f"[FATAL] {remove_colors(message)}\n")
 
-class PreattyLogger(Logger):
+# PrettyLogger for stdout
+class PrettyLogger(Logger):
     def debug(self, message):
         self.call(Logger.DEBUG, f"{gray}{bold}DEBUG{reset} {format_colors(message)}\n")
 
@@ -142,17 +149,20 @@ class NodeTransform:
     expression_vars_regex = re.compile("([a-zA-Z]+)")
     greater_regex = re.compile("\sgreater\s")
     smaller_regex = re.compile("\ssmaller\s")
-    vars = {}
 
+    # Constructor
     def __init__(self, root):
         self.root = root
+        self.vars = {}
 
+    # Stringify a value
     def stringify(self, object):
         if isinstance(object, float):
             return f"{object:10.3f}".strip()
         else:
             return str(object)
 
+    # Execute an expression
     def exec_expression(self, exp):
         exp = self.greater_regex.sub(">", exp)
         exp = self.smaller_regex.sub("<", exp)
@@ -182,7 +192,7 @@ class NodeTransform:
             logger.fatal(f"Error while evaluating expression §o'{txt}'§R: {e}")
             sys.exit(1)
 
-
+    # Repeat component
     def comp_repeat(self, node, parent, before):
         if node.hasAttributes():
             attr = node.attributes.item(0)
@@ -212,6 +222,7 @@ class NodeTransform:
         if not before:
             parent.removeChild(node)
 
+    # Define component
     def comp_define(self, node, parent, before):
         if node.hasAttributes():
             attrs = node.attributes
@@ -232,6 +243,7 @@ class NodeTransform:
         if not before:
             parent.removeChild(node)
 
+    # If component
     def comp_if(self, node, parent, before):
         condition = node.getAttribute("cond").strip()
 
@@ -250,15 +262,15 @@ class NodeTransform:
 
         if not before:
             parent.removeChild(node)
-
     
+    # The available components
     components = {
         "if": comp_if,
         "repeat": comp_repeat,
         "define": comp_define
     }
 
-
+    # Transform a node
     def transform_node(self, node, parent, before):
         if node.nodeType == node.TEXT_NODE:
             node.data = node.data.strip()
@@ -300,6 +312,7 @@ class NodeTransform:
         self.transform_node(self.root, self.root, None)
 
 
+# Compile a file
 def compile(src, dest):
     start = time()
 
@@ -317,6 +330,7 @@ def compile(src, dest):
     return time() - start
 
 
+# Print the logo
 def print_logo():
     print(f"""{orange}
 ░█▀▀█ █▀▀ ░█▀▀▀█ ░█  ░█ ░█▀▀█ 
@@ -331,23 +345,12 @@ def print_logo():
     print("\n")
 
 
+# Print the version
 def cmd_version():
     print(version)
 
 
-# operand = require_arg_or(1, cmd_help)
-# operands = {
-#     "compile": cmd_compile,
-#     "help": cmd_help,
-#     "version": cmd_version
-# }
-
-# if operand in operands:
-#     operands[operand]()
-# else:
-#     print(f"{red}ERROR:{reset} Unknown opperand '{operand}'")
-
-
+# Custom help formatter
 class help_formatter(HelpFormatter):
     def format_help(self):
         print_logo()
@@ -359,6 +362,7 @@ class help_formatter(HelpFormatter):
             self.add_text(f"{blue}[USAGE]{reset} {self._format_usage(usage, actions, groups, '')}")
 
 
+# Main function
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Process some integers.', formatter_class=help_formatter)
 
@@ -379,7 +383,7 @@ if __name__ == "__main__":
 
     std_logger = None
     if not args.silent:
-        std_logger = PreattyLogger(loglevel, sys.stdout)
+        std_logger = PrettyLogger(loglevel, sys.stdout)
 
     file_logger = None
     if args.log:
