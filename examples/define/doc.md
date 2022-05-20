@@ -1,6 +1,7 @@
 # Define
 
 ## Examples
+
 ```xml
 <define myVariable="120" />
 <define myOther="{myVariable/12}">
