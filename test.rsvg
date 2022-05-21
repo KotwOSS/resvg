@@ -16,4 +16,10 @@
     <greet name="keky">
         <p>This will be displayed before and after the greeting</p>
     </greet>
+
+    <g>
+        <for i="0; i smaller 10; i+=1">
+            <p>${i}</p>
+        </for>
+    </g>
 </svg>

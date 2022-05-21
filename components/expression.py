@@ -25,11 +25,36 @@ class Expression(Generic[T]):
         self.transformer = transformer
 
     def parse(self, exp: str) -> T:
-        exp = self.greater_regex.sub(">", exp)
-        exp = self.smaller_regex.sub("<", exp)
+        return RawExpression[self.__orig_class__.__args__[0] if hasattr(self, "__orig_class__")
+                and len(self.__orig_class__.__args__) >= 1 else None](self.transformer).parse(exp).eval()
+
+class RawExpression(Generic[T]):
+    greater_regex = re.compile("\sgreater\s")
+    smaller_regex = re.compile("\ssmaller\s")
+    expression_globals = {
+        "__import__": None,
+        "open": None,
+        "exec": None,
+        "eval": None,
+        "math": math,
+        "random": random,
+    }
+
+    def __init__(self, transformer) -> None:
+        super().__init__()
+
+        self.transformer = transformer
+
+    def parse(self, exp: str):
+        self.exp = exp.strip()
+        return self
+        
+    def eval(self) -> T:
+        self.exp = self.greater_regex.sub(">", self.exp)
+        self.exp = self.smaller_regex.sub("<", self.exp)
 
         try:
-            val = eval(exp, self.expression_globals, self.transformer.vars)
+            val = eval(self.exp, self.expression_globals, self.transformer.vars)
             if (
                 hasattr(self, "__orig_class__")
                 and len(self.__orig_class__.__args__) >= 1
@@ -47,7 +72,7 @@ class Expression(Generic[T]):
                 )
         except Exception as e:
             Logger.logger.exit_fatal(
-                f"Error while evaluating expression §o'{exp}'§R: {e}"
+                f"Error while evaluating expression §o'{self.exp}'§R: {e}"
             )
 
 

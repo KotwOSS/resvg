@@ -46,7 +46,7 @@ def compile(src, dest, pretty):
     transformer.transform()
 
     if pretty:
-        pretty_xml = doc.documentElement.toprettyxml()
+        pretty_xml = doc.documentElement.toprettyxml(indent="    ")
         pretty_xml = os.linesep.join([s for s in pretty_xml.splitlines()
                               if s.strip()])
         dest.write(pretty_xml)

@@ -59,9 +59,12 @@ class NodeTransform:
             return node
 
         if node.nodeType == node.COMMENT_NODE:
-            if not self.comments and not before:
-                parent.removeChild(node)
-            return node
+            if not self.comments:
+                if not before:
+                    parent.removeChild(node)
+                return None
+            else:
+                return node
 
         if node.hasAttributes():
             attrs = node.attributes
