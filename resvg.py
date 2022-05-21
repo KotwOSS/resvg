@@ -121,7 +121,6 @@ def main():
         "trust-exp": ["enable trust for expressions", "store_true"],
         "trust-stmt": ["enable trust for statements", "store_true"],
         "trust": ["enable trust for statements and expressions", "store_true"],
-        "trust": ["enable trust for statements and expressions", "store_true"],
         "hide-logo": ["hide logo", "store_true"],
         "comments": ["keep the comments from the ReSVG file", "store_true"],
     }
