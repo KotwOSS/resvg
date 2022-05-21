@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+    <run>
+print("Here python code can be executed")
+
+print("10 + 10 = ", 10 + 10)
+    </run>
+</svg>
