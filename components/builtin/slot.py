@@ -11,8 +11,10 @@ class SlotComponent(Component):
         if slot != None:
             self.insert_nodes_before(slot)
         else:
-            Logger.logger.exit_fatal(f"No slot available! Are you in a §o'comp'§R component?")
-        
+            Logger.logger.exit_fatal(
+                f"No slot available! Are you in a §o'comp'§R component?"
+            )
+
         self.destroy()
 
 

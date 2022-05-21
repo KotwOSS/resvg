@@ -97,10 +97,11 @@ class Component(ABC):
     def run(self, args: Dict[str, Any]) -> Any:
         pass
 
+
 class Argument:
     def __init__(self, name, value):
         self.name = name
         self.value = value
-    
+
     def from_attr(attr, instance):
         return Argument(attr.name, instance.parse(attr.value))

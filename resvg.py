@@ -47,8 +47,7 @@ def compile(src, dest, pretty):
 
     if pretty:
         pretty_xml = doc.documentElement.toprettyxml(indent="    ")
-        pretty_xml = os.linesep.join([s for s in pretty_xml.splitlines()
-                              if s.strip()])
+        pretty_xml = os.linesep.join([s for s in pretty_xml.splitlines() if s.strip()])
         dest.write(pretty_xml)
     else:
         doc.documentElement.writexml(dest)
@@ -111,7 +110,11 @@ def main():
         "-s", "--silent", dest="silent", help="run in silent mode", action="store_true"
     )
     parser.add_argument(
-        "-p", "--pretty", dest="pretty", help="pretty print the svg", action="store_true"
+        "-p",
+        "--pretty",
+        dest="pretty",
+        help="pretty print the svg",
+        action="store_true",
     )
     parser.add_argument(
         "-e",
@@ -177,6 +180,7 @@ def main():
         sys.exit(0)
 
     parser.print_help()
+
 
 if __name__ == "__main__":
     main()

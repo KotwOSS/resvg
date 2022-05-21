@@ -46,9 +46,7 @@ register_component("while", WhileComponent)
 
 
 class ForComponent(Component):
-    arguments = {
-        "*:1": Raw[str]
-    }
+    arguments = {"*:1": Raw[str]}
 
     def run(self, args):
         nodes = self.childnodes()
@@ -68,8 +66,16 @@ class ForComponent(Component):
             while cond.eval():
                 self.insert_nodes_before(nodes)
                 after.exec()
+        elif len(segments) == 1:
+            range_val = RawExpression[range](self.transformer).parse(segments[0]).eval()
+
+            for i in range_val:
+                self.transformer.set_var(variable, i)
+                self.insert_nodes_before(nodes)
         else:
-            Logger.logger.exit_fatal(f"Bad formated for statement: §o'{statement}'§R!")
+            Logger.logger.exit_fatal(
+                f"Bad formated for statement: §o'{statement.value}'§R!"
+            )
 
         self.destroy()
 

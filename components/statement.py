@@ -28,4 +28,3 @@ class RawStatement:
             Logger.logger.exit_fatal(f"Run component may not contain imports!")
         else:
             exec(self.stmt, self.exec_globals, self.transformer.vars)
-    

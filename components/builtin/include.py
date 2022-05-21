@@ -8,10 +8,7 @@ from util.logging import Logger
 
 
 class IncludeComponent(Component):
-    arguments = {
-        "path": Raw[str],
-        "*": Expression[Any]
-    }
+    arguments = {"path": Raw[str], "*": Expression[Any]}
 
     def run(self, args):
         path = args["path"]

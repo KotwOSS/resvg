@@ -8,8 +8,6 @@ from util.logging import Logger
 class RunComponent(Component):
     arguments = {}
 
-    
-
     def run(self, args):
         nodes = self.childnodes()
 

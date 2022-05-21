@@ -4,9 +4,7 @@ from components.expression import Raw
 
 
 class CompComponent(Component):
-    arguments = {
-        "name": Raw[str]
-    }
+    arguments = {"name": Raw[str]}
 
     def run(self, args):
         self.transformer.define_comp(args["name"], self.childnodes())

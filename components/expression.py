@@ -25,8 +25,17 @@ class Expression(Generic[T]):
         self.transformer = transformer
 
     def parse(self, exp: str) -> T:
-        return RawExpression[self.__orig_class__.__args__[0] if hasattr(self, "__orig_class__")
-                and len(self.__orig_class__.__args__) >= 1 else None](self.transformer).parse(exp).eval()
+        return (
+            RawExpression[
+                self.__orig_class__.__args__[0]
+                if hasattr(self, "__orig_class__")
+                and len(self.__orig_class__.__args__) >= 1
+                else None
+            ](self.transformer)
+            .parse(exp)
+            .eval()
+        )
+
 
 class RawExpression(Generic[T]):
     greater_regex = re.compile("\sgreater\s")
@@ -48,7 +57,7 @@ class RawExpression(Generic[T]):
     def parse(self, exp: str):
         self.exp = exp.strip()
         return self
-        
+
     def eval(self) -> T:
         self.exp = self.greater_regex.sub(">", self.exp)
         self.exp = self.smaller_regex.sub("<", self.exp)

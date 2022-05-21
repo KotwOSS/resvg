@@ -3,7 +3,7 @@ from typing import Any
 
 from util.logging import Logger
 from util.regex import multi_replace
-from .expression import Expression
+from .expression import RawExpression
 from . import components
 
 # Transform nodes
@@ -11,7 +11,7 @@ class NodeTransform:
     expression_regex = re.compile(r"{([a-zA-Z0-9.*/+-^()\"' ]+)}")
     text_expression_regex = re.compile(r"\${([a-zA-Z0-9.*/+-^()\"' ]+)}")
     # Constructor
-    def __init__(self, root, comments = False):
+    def __init__(self, root, comments=False):
         self.root = root
         self.vars = {}
         self.comps = {}
@@ -39,7 +39,7 @@ class NodeTransform:
         Logger.logger.debug(f"Append slot")
 
         self.slots.append(slot)
-    
+
     def pop_slot(self):
         Logger.logger.debug(f"Pop slot")
 
@@ -54,7 +54,9 @@ class NodeTransform:
             node.data = multi_replace(
                 node.data.strip(),
                 self.text_expression_regex,
-                lambda exp: self.stringify(Expression[Any](self).parse(exp.group(1))),
+                lambda exp: self.stringify(
+                    RawExpression[Any](self).parse(exp.group(1)).eval()
+                ),
             )
             return node
 
@@ -75,7 +77,7 @@ class NodeTransform:
                     attr.value.strip(),
                     self.expression_regex,
                     lambda exp: self.stringify(
-                        Expression[Any](self).parse(exp.group(1))
+                        RawExpression[Any](self).parse(exp.group(1)).eval()
                     ),
                 )
 
@@ -97,10 +99,10 @@ class NodeTransform:
                 )
                 if transformed:
                     parent.insertBefore(transformed, before if before else node)
-            
+
             if not before:
                 parent.removeChild(node)
-            
+
             self.pop_slot()
         elif node.hasChildNodes():
             for child in list(node.childNodes):
