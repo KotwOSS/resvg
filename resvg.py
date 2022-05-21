@@ -35,17 +35,23 @@ except ImportError as e:
     sys.exit(1)
 
 # Compile a file
-def compile(src, dest):
+def compile(src, dest, pretty):
     start = time()
 
     doc = minidom.parse(src)
 
     root = doc.documentElement
 
-    transformer = NodeTransform(root)
+    transformer = NodeTransform(root, pretty)
     transformer.transform()
 
-    doc.documentElement.writexml(dest)
+    if pretty:
+        pretty_xml = doc.documentElement.toprettyxml()
+        pretty_xml = os.linesep.join([s for s in pretty_xml.splitlines()
+                              if s.strip()])
+        dest.write(pretty_xml)
+    else:
+        doc.documentElement.writexml(dest)
 
     doc.unlink()
 
@@ -105,7 +111,14 @@ def main():
         "-s", "--silent", dest="silent", help="run in silent mode", action="store_true"
     )
     parser.add_argument(
-        "-e", "--only-errors", dest="only_errors", help="Only display errors and fatals", action="store_true"
+        "-p", "--pretty", dest="pretty", help="pretty print the svg", action="store_true"
+    )
+    parser.add_argument(
+        "-e",
+        "--only-errors",
+        dest="only_errors",
+        help="Only display errors and fatals",
+        action="store_true",
     )
     parser.add_argument(
         "-c",
@@ -154,7 +167,7 @@ def main():
             f"Compiling §o'{input_file}'§R to §o'{output_file if output_file else 'stdout'}'§R"
         )
 
-        took = compile(input_file, output_stream)
+        took = compile(input_file, output_stream, args.pretty)
 
         if not output_file:
             print()
@@ -163,6 +176,7 @@ def main():
 
         sys.exit(0)
 
+    parser.print_help()
 
 if __name__ == "__main__":
     main()

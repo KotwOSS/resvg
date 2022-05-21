@@ -11,9 +11,12 @@ class NodeTransform:
     expression_regex = re.compile(r"{([a-zA-Z0-9.*/+-^()\"' ]+)}")
     text_expression_regex = re.compile(r"\${([a-zA-Z0-9.*/+-^()\"' ]+)}")
     # Constructor
-    def __init__(self, root):
+    def __init__(self, root, comments = False):
         self.root = root
         self.vars = {}
+        self.comps = {}
+        self.slots = []
+        self.comments = comments
 
     # Stringify a value
     def stringify(self, object):
@@ -22,15 +25,41 @@ class NodeTransform:
         else:
             return str(object)
 
+    def set_var(self, name, value):
+        Logger.logger.debug(f"Set variable §o'{name}'§R to §o'{value}'§R")
+
+        self.vars[name] = value
+
+    def define_comp(self, name, nodes):
+        Logger.logger.debug(f"Define comp §o'{name}'§R")
+
+        self.comps[name] = nodes
+
+    def append_slot(self, slot):
+        Logger.logger.debug(f"Append slot")
+
+        self.slots.append(slot)
+    
+    def pop_slot(self):
+        Logger.logger.debug(f"Pop slot")
+
+        return self.slots.pop()
+
+    def get_slot(self):
+        return self.slots[-1] if len(self.slots) > 0 else None
+
     # Transform a node
     def transform_node(self, node, parent, before):
         if node.nodeType == node.TEXT_NODE:
-            node.data = multi_replace(node.data.strip(), self.text_expression_regex, 
-                lambda exp: self.stringify(Expression[Any](self).parse(exp.group(1))))
+            node.data = multi_replace(
+                node.data.strip(),
+                self.text_expression_regex,
+                lambda exp: self.stringify(Expression[Any](self).parse(exp.group(1))),
+            )
             return node
 
         if node.nodeType == node.COMMENT_NODE:
-            if not before:
+            if not self.comments and not before:
                 parent.removeChild(node)
             return node
 
@@ -39,11 +68,37 @@ class NodeTransform:
             for i in range(0, attrs.length):
                 attr = attrs.item(i)
 
-                attr.value = multi_replace(attr.value.strip(), self.expression_regex, 
-                    lambda exp: self.stringify(Expression[Any](self).parse(exp.group(1))))
+                attr.value = multi_replace(
+                    attr.value.strip(),
+                    self.expression_regex,
+                    lambda exp: self.stringify(
+                        Expression[Any](self).parse(exp.group(1))
+                    ),
+                )
 
         if node.nodeName in components:
             return components[node.nodeName](node, parent, before, self).transform()
+        elif node.nodeName in self.comps:
+            self.append_slot(list(node.childNodes) if node.hasChildNodes() else [])
+
+            if node.hasAttributes():
+                for i in range(0, node.attributes.length):
+                    attr = node.attributes.item(i)
+                    self.set_var(attr.name, attr.value)
+
+            nodes = self.comps[node.nodeName]
+            for child in nodes:
+                clone = child.cloneNode(True)
+                transformed = self.transform_node(
+                    clone, parent, before if before else node
+                )
+                if transformed:
+                    parent.insertBefore(transformed, before if before else node)
+            
+            if not before:
+                parent.removeChild(node)
+            
+            self.pop_slot()
         elif node.hasChildNodes():
             for child in list(node.childNodes):
                 self.transform_node(child, node, before)

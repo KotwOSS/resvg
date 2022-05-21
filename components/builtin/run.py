@@ -4,9 +4,9 @@ from components.component import Component
 from components.expression import Expression
 from util.logging import Logger
 
+
 class RunComponent(Component):
-    arguments = {
-    }
+    arguments = {}
 
     exec_globals = {
         "import": None,
@@ -37,5 +37,6 @@ class RunComponent(Component):
             exec(code, self.exec_globals, self.transformer.vars)
 
         self.destroy()
+
 
 register_component("run", RunComponent)

@@ -1,7 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg">
-    <run>
-print("Here python code can be executed")
+    <comp name="greet">
+        <!-- KEKW -->
+        <slot/>
+        <repeat _="10">
+            <h1>Hello, ${name}!</h1>
+        </repeat>
+        <slot />  
+    </comp>
 
-print("10 + 10 = ", 10 + 10)
-    </run>
+
+    <greet name="Ricky">
+        <p>This will be displayed before and after the greeting</p>
+    </greet>
+
+    <greet name="keky">
+        <p>This will be displayed before and after the greeting</p>
+    </greet>
 </svg>

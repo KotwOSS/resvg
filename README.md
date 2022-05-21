@@ -84,6 +84,18 @@ Log to a file:
 resvg --log myfile.log
 ```
 
+Only display the errors:
+
+```sh
+resvg --compile --only-errors -i input.rsvg
+```
+
+Pretty print the xml:
+
+```sh
+resvg --compile --pretty -i input.rsvg
+```
+
 Specify the logging level:
 
 ```sh

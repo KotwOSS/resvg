@@ -4,7 +4,9 @@ from typing import Any, Generic, TypeVar
 from util.logging import Logger
 
 # Expression class
-T = TypeVar('T')
+T = TypeVar("T")
+
+
 class Expression(Generic[T]):
     greater_regex = re.compile("\sgreater\s")
     smaller_regex = re.compile("\ssmaller\s")
@@ -28,19 +30,31 @@ class Expression(Generic[T]):
 
         try:
             val = eval(exp, self.expression_globals, self.transformer.vars)
-            if hasattr(self, "__orig_class__") and len(self.__orig_class__.__args__) >= 1:
+            if (
+                hasattr(self, "__orig_class__")
+                and len(self.__orig_class__.__args__) >= 1
+            ):
                 expected_type = self.__orig_class__.__args__[0]
                 if expected_type == Any or isinstance(val, expected_type):
                     return val
                 else:
-                    Logger.logger.exit_fatal(f"Mismatched expression result! Expected type §o'{expected_type}'§R!")
+                    Logger.logger.exit_fatal(
+                        f"Mismatched expression result! Expected type §o'{expected_type}'§R!"
+                    )
             else:
-                Logger.logger.exit_fatal(f"Expression instance doesn't have enough type arguments!")
+                Logger.logger.exit_fatal(
+                    f"Expression instance doesn't have enough type arguments!"
+                )
         except Exception as e:
-            Logger.logger.exit_fatal(f"Error while evaluating expression §o'{exp}'§R: {e}")
+            Logger.logger.exit_fatal(
+                f"Error while evaluating expression §o'{exp}'§R: {e}"
+            )
+
 
 # Raw class
-T = TypeVar('T')
+T = TypeVar("T")
+
+
 class Raw(Generic[T]):
     def __init__(self, transformer) -> T:
         super().__init__()
@@ -57,6 +71,10 @@ class Raw(Generic[T]):
             elif expected_type == float:
                 return float(val)
             else:
-                Logger.logger.exit_fatal(f"Unknown expected raw type §o'{expected_type}'§R!")
+                Logger.logger.exit_fatal(
+                    f"Unknown expected raw type §o'{expected_type}'§R!"
+                )
         except Exception as e:
-            Logger.logger.exit_fatal(f"Error while parsing value §o'{val}' to raw type {expected_type}§R: {e}")
+            Logger.logger.exit_fatal(
+                f"Error while parsing value §o'{val}' to raw type {expected_type}§R: {e}"
+            )

@@ -28,7 +28,6 @@ class Logger:
         sys.exit(1)
 
 
-
 # CombinedLogger to combine multiple loggers
 class CombinedLogger(Logger):
     def __init__(self, loggers):
@@ -39,7 +38,7 @@ class CombinedLogger(Logger):
             getattr(logger, name)(message) if logger else None
             for logger in self.loggers
         ]
-    
+
     def exit_fatal(self, message):
         return self.call("exit_fatal", message)
 

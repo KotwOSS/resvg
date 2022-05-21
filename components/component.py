@@ -23,12 +23,20 @@ class Component(ABC):
         if self.node.hasChildNodes():
             return list(self.node.childNodes)
         else:
-            Logger.logger.exit_fatal(f"Component §o{type(self).__name__}§R has to have childNodes!")
+            Logger.logger.exit_fatal(
+                f"Component §o{type(self).__name__}§R has to have childNodes!"
+            )
+
+    def set_var(self, name, value):
+        """Set a variable"""
+        self.transformer.set_var(name, value)
 
     def insert_before(self, node):
         """Insert a node before the component"""
         if node:
-            return self.parent.insertBefore(node, self.before if self.before else self.node)
+            return self.parent.insertBefore(
+                node, self.before if self.before else self.node
+            )
 
     def insert_nodes_before(self, nodes):
         """Insert a list of nodes before the component. (This will clone the nodes)"""
@@ -38,8 +46,9 @@ class Component(ABC):
 
     def transform_node(self, node):
         """Transform a node"""
-        return self.transformer.transform_node(node, self.parent, self.before if self.before else self.node)
-
+        return self.transformer.transform_node(
+            node, self.parent, self.before if self.before else self.node
+        )
 
     def transform(self) -> Any:
         attributes = self.node.attributes
@@ -51,11 +60,9 @@ class Component(ABC):
                 attrval = []
                 for i in range(attributes.length):
                     attr = attributes.item(i)
-                    attrval.append({
-                        "name": attr.name,
-                        "value": instance.parse(attr.value),
-                    })
-                    args["*"] = attrval
+                    if attr.name not in args:
+                        attrval.append(Argument.from_attr(attr, instance))
+                args["*"] = attrval
                 if len(attrname) > 1:
                     last = attrname[-1:]
                     min_or_max = last == "-" or last == "+"
@@ -71,15 +78,29 @@ class Component(ABC):
                         condition = count == expected_count
 
                     if not condition:
-                        Logger.logger.exit_fatal(f"Expected §o'{expected_count}'{last if min_or_max else ''}§R arguments for component §o'{type(self).__name__}'§R but found §o'{count}'§R!")
+                        Logger.logger.exit_fatal(
+                            f"Expected §o'{expected_count}'{last if min_or_max else ''}§R arguments for component §o'{type(self).__name__}'§R but found §o'{count}'§R!"
+                        )
             else:
                 attr = attributes.getNamedItem(attrname)
-                attrval = instance.parse(attr.value)
-                args[attrname] = attrval
+                if attr:
+                    attrval = instance.parse(attr.value)
+                    args[attrname] = attrval
+                else:
+                    Logger.logger.exit_fatal(
+                        f"Component §o'{type(self).__name__}'§R has to have attribute §o'{attrname}'§R!"
+                    )
 
         return self.run(args)
-
 
     @abstractmethod
     def run(self, args: Dict[str, Any]) -> Any:
         pass
+
+class Argument:
+    def __init__(self, name, value):
+        self.name = name
+        self.value = value
+    
+    def from_attr(attr, instance):
+        return Argument(attr.name, instance.parse(attr.value))
