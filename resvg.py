@@ -109,15 +109,15 @@ def main():
     args = {
         "input;i": ["the input file", str],
         "output;o": ["the output file", str],
-        "log": ["specify a log file", str],
-        "level": ["specify a log level", int, 0],
-        "indent": ["specify the indentation", int],
-        "newl": ["specify the newline character", str],
         "compile;c": ["compile a file", "store_true"],
         "version;v": ["show the version", "store_true"],
         "silent;s": ["run in silent mode", "store_true"],
         "pretty;p": ["pretty print the svg", "store_true"],
         "only-errors;e": ["only print errors and fatals", "store_true"],
+        "log": ["specify a log file", str],
+        "level": ["specify a log level", int, 0],
+        "indent": ["specify the indentation", int],
+        "newl": ["specify the newline character", str],
         "trust-exp": ["enable trust for expressions", "store_true"],
         "trust-stmt": ["enable trust for statements", "store_true"],
         "trust": ["enable trust for statements and expressions", "store_true"],
@@ -133,8 +133,9 @@ def main():
         }
         kwargs["action" if isinstance(info[1], str) else "type"] = info[1]
         kwargs["default"] = info[2] if len(info) > 2 else None
+        kwargs["dest"] = parts[0].replace("-", "_")
         if len(parts) == 2:
-            parser.add_argument(f"--{parts[0]}", f"-{parts[1]}", **kwargs)
+            parser.add_argument(f"-{parts[1]}", f"--{parts[0]}", **kwargs)
         else:
             parser.add_argument(f"--{parts[0]}", **kwargs)
 
