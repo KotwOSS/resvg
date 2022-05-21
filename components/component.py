@@ -26,7 +26,14 @@ class Component(ABC):
             Logger.logger.exit_fatal(
                 f"Component §o{type(self).__name__}§R has to have childNodes!"
             )
-
+    
+    def childnodes_or_empty(self):
+        """Return the child nodes of the component as a list or an empty list"""
+        if self.node.hasChildNodes():
+            return list(self.node.childNodes)
+        else:
+            return []
+    
     def set_var(self, name, value):
         """Set a variable"""
         self.transformer.set_var(name, value)

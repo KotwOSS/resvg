@@ -20,7 +20,11 @@ class IncludeComponent(Component):
             for arg in args["*"]:
                 self.set_var(arg.name, arg.value)
 
+            self.transformer.append_slot(self.childnodes_or_empty())
+
             self.insert_before(self.transform_node(node))
+
+            self.transformer.pop_slot()
 
             Logger.logger.debug(f"Successfully included §o'{path}'§R")
         else:
