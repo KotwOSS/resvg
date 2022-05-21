@@ -35,22 +35,24 @@ except ImportError as e:
     sys.exit(1)
 
 # Compile a file
-def compile(src, dest, pretty):
+def compile(src, dest):
     start = time()
 
     doc = minidom.parse(src)
 
     root = doc.documentElement
 
-    transformer = NodeTransform(root, pretty)
+    transformer = NodeTransform(root)
     transformer.transform()
 
-    if pretty:
-        pretty_xml = doc.documentElement.toprettyxml(indent="    ")
-        pretty_xml = os.linesep.join([s for s in pretty_xml.splitlines() if s.strip()])
-        dest.write(pretty_xml)
-    else:
-        doc.documentElement.writexml(dest)
+    pretty_xml = doc.documentElement.toprettyxml(
+        newl=Settings.newl, indent=Settings.indent
+    )
+    if Settings.newl != "":
+        pretty_xml = os.linesep.join(
+            [s for s in pretty_xml.split(Settings.newl) if s.strip()]
+        )
+    dest.write(pretty_xml)
 
     doc.unlink()
 
@@ -94,50 +96,47 @@ class help_formatter(HelpFormatter):
             )
 
 
+def unescape_string(string):
+    return string.encode("latin-1", "backslashreplace").decode("unicode-escape")
+
+
 # Main function
 def main():
     parser = argparse.ArgumentParser(
         description="Process ReSVG files.", formatter_class=help_formatter
     )
 
-    parser.add_argument("--log", dest="log", help="specify a log file", type=str)
+    args = {
+        "input;i": ["the input file", str],
+        "output;o": ["the output file", str],
+        "log": ["specify a log file", str],
+        "level": ["specify a log level", int, 0],
+        "indent": ["specify the indentation", int],
+        "newl": ["specify the newline character", str],
+        "compile;c": ["compile a file", "store_true"],
+        "version;v": ["show the version", "store_true"],
+        "silent;s": ["run in silent mode", "store_true"],
+        "pretty;p": ["pretty print the svg", "store_true"],
+        "only-errors;e": ["only print errors and fatals", "store_true"],
+        "trust-exp": ["enable trust for expressions", "store_true"],
+        "trust-stmt": ["enable trust for statements", "store_true"],
+        "trust": ["enable trust for statements and expressions", "store_true"],
+        "trust": ["enable trust for statements and expressions", "store_true"],
+        "hide-logo": ["hide logo", "store_true"],
+        "comments": ["keep the comments from the ReSVG file", "store_true"],
+    }
 
-    parser.add_argument(
-        "--level", dest="level", help="specify a log level", type=int, default=0
-    )
-
-    parser.add_argument(
-        "-s", "--silent", dest="silent", help="run in silent mode", action="store_true"
-    )
-    parser.add_argument(
-        "-p",
-        "--pretty",
-        dest="pretty",
-        help="pretty print the svg",
-        action="store_true",
-    )
-    parser.add_argument(
-        "-e",
-        "--only-errors",
-        dest="only_errors",
-        help="Only display errors and fatals",
-        action="store_true",
-    )
-    parser.add_argument(
-        "-c",
-        "--compile",
-        dest="compile",
-        help="compile input file",
-        action="store_true",
-    )
-    parser.add_argument(
-        "-v", "--version", dest="version", help="show the version", action="store_true"
-    )
-
-    parser.add_argument("-i", "--input", dest="input", help="the input file", type=str)
-    parser.add_argument(
-        "-o", "--output", dest="output", help="the output file", type=str
-    )
+    for arg, info in args.items():
+        parts = arg.split(";")
+        kwargs = {
+            "help": info[0],
+        }
+        kwargs["action" if isinstance(info[1], str) else "type"] = info[1]
+        kwargs["default"] = info[2] if len(info) > 2 else None
+        if len(parts) == 2:
+            parser.add_argument(f"--{parts[0]}", f"-{parts[1]}", **kwargs)
+        else:
+            parser.add_argument(f"--{parts[0]}", **kwargs)
 
     args = parser.parse_args()
 
@@ -153,12 +152,28 @@ def main():
 
     Logger.logger = CombinedLogger([file_logger, std_logger])
 
+    Settings.trust_exp = args.trust_exp or args.trust
+    Settings.trust_stmt = args.trust_stmt or args.trust
+    Settings.pretty = args.pretty
+    Settings.newl = (
+        "\n"
+        if args.pretty and args.newl == None
+        else unescape_string(args.newl)
+        if args.newl
+        else ""
+    )
+    Settings.indent = " " * (
+        4 if args.pretty and args.indent == None else args.indent if args.indent else 0
+    )
+    Settings.comments = args.pretty or args.comments
+    Settings.hide_logo = args.silent or args.only_errors or args.hide_logo
+
     if args.version:
         cmd_version()
         sys.exit(0)
 
     if args.compile:
-        if not args.silent and not args.only_errors:
+        if not Settings.hide_logo:
             print_logo()
 
         input_file = args.input
@@ -170,7 +185,7 @@ def main():
             f"Compiling §o'{input_file}'§R to §o'{output_file if output_file else 'stdout'}'§R"
         )
 
-        took = compile(input_file, output_stream, args.pretty)
+        took = compile(input_file, output_stream)
 
         if not output_file:
             print()

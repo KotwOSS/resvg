@@ -1,6 +1,7 @@
 import re
 from typing import Any
 
+from components.settings import Settings
 from util.logging import Logger
 from util.regex import multi_replace
 from .expression import RawExpression
@@ -11,12 +12,11 @@ class NodeTransform:
     expression_regex = re.compile(r"{([a-zA-Z0-9.*/+-^()\"' ]+)}")
     text_expression_regex = re.compile(r"\${([a-zA-Z0-9.*/+-^()\"' ]+)}")
     # Constructor
-    def __init__(self, root, comments=False):
+    def __init__(self, root):
         self.root = root
         self.vars = {}
         self.comps = {}
         self.slots = []
-        self.comments = comments
 
     # Stringify a value
     def stringify(self, object):
@@ -61,7 +61,7 @@ class NodeTransform:
             return node
 
         if node.nodeType == node.COMMENT_NODE:
-            if not self.comments:
+            if not Settings.comments:
                 if not before:
                     parent.removeChild(node)
                 return None

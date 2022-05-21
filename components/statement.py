@@ -1,4 +1,5 @@
 import math, random, re
+from components.settings import Settings
 
 from util.logging import Logger
 
@@ -24,6 +25,11 @@ class RawStatement:
         return self
 
     def exec(self):
+        if not Settings.trust_stmt:
+            Logger.logger.exit_fatal(
+                "Statement trust mode not enabled but code contains statements! Perhaps you might wanna add the §o--trust-stmt§R switch to your command line?"
+            )
+
         if self.import_regex.search(self.stmt):
             Logger.logger.exit_fatal(f"Run component may not contain imports!")
         else:

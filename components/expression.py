@@ -1,5 +1,6 @@
 import math, re, random
 from typing import Any, Generic, TypeVar
+from components.settings import Settings
 
 from util.logging import Logger
 
@@ -59,6 +60,11 @@ class RawExpression(Generic[T]):
         return self
 
     def eval(self) -> T:
+        if not Settings.trust_exp:
+            Logger.logger.exit_fatal(
+                "Expression trust mode not enabled but code contains expressions! Perhaps you might wanna add the §o--trust-exp§R switch to your command line?"
+            )
+
         self.exp = self.greater_regex.sub(">", self.exp)
         self.exp = self.smaller_regex.sub("<", self.exp)
 

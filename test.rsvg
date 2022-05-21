@@ -18,7 +18,7 @@
     </greet>
 
     <g>
-        <for i="20;10">
+        <for i="0; i smaller 10; i += 1">
             <p>${i}</p>
         </for>
     </g>
