@@ -14,328 +14,69 @@
 
 
 # Details
-version = "0.0.0alpha1"
+version = "0.0.0alpha2"
 authors = ["KotwOSS"]
 license = "MIT"
 year = 2022
 
-
-# colors
-red = "\033[38;2;255;100;100m"
-blue = "\033[38;2;100;100;255m"
-orange = "\033[38;2;255;150;0m"
-yellow = "\033[38;2;255;205;50m"
-gray = "\033[38;2;180;180;180m"
-reset = "\033[0m"
-bold = "\033[1m"
-
+from util import *
+from components import *
 
 # Import the required modules
 try:
+    from watchdog.observers import Observer
+    from watchdog.events import FileSystemEventHandler
+    import sys, argparse
     from argparse import HelpFormatter
-    import sys, re
     from xml.dom import minidom
-    from time import time
+    import time
     from argparse import SUPPRESS
-    import argparse
 except ImportError as e:
     print(f"{red}ERROR{reset} missing required module: {e}")
     sys.exit(1)
 
-
-# Color formating
-colors = {
-    "§B": bold,
-    "§R": reset,
-    "§r": red,
-    "§o": orange,
-    "§b": blue,
-    "§y": yellow,
-    "§g": gray,
-}
-
-colors_regex = re.compile("§[a-zA-Z]")
-
-# Remove all the color codes in a string
-def remove_colors(text):
-    return colors_regex.sub("", text)
-
-
-# Format all the color codes in a string
-def format_colors(text):
-    for key, value in colors.items():
-        text = text.replace(key, value)
-    return text
-
-
-# Logging
-logger = None
-
-# Logger class
-class Logger:
-    DEBUG = -1
-    INFO = 0
-    WARNING = 1
-    ERROR = 2
-    FATAL = 3
-
-    def __init__(self, level, stream):
-        self.level = level
-        self.stream = stream
-
-    def call(self, level, message):
-        if self.level <= level:
-            self.stream.write(message)
-
-
-# CombinedLogger to combine multiple loggers
-class CombinedLogger(Logger):
-    def __init__(self, loggers):
-        self.loggers = loggers
-
-    def call(self, name, message):
-        return [
-            getattr(logger, name)(message) if logger else None
-            for logger in self.loggers
-        ]
-
-    def debug(self, message):
-        return self.call("debug", message)
-
-    def info(self, message):
-        return self.call("info", message)
-
-    def warning(self, message):
-        return self.call("warning", message)
-
-    def error(self, message):
-        return self.call("error", message)
-
-    def fatal(self, message):
-        return self.call("fatal", message)
-
-
-# SimpleLogger for log files
-class SimpleLogger(Logger):
-    def debug(self, message):
-        self.call(Logger.DEBUG, f"[DEBUG] {remove_colors(message)}\n")
-
-    def info(self, message):
-        self.call(Logger.INFO, f"[INFO] {remove_colors(message)}\n")
-
-    def warning(self, message):
-        self.call(Logger.WARNING, f"[WARNING] {remove_colors(message)}\n")
-
-    def error(self, message):
-        self.call(Logger.ERROR, f"[ERROR] {remove_colors(message)}\n")
-
-    def fatal(self, message):
-        self.call(Logger.FATAL, f"[FATAL] {remove_colors(message)}\n")
-
-
-# PrettyLogger for stdout
-class PrettyLogger(Logger):
-    def debug(self, message):
-        self.call(Logger.DEBUG, f"{gray}{bold}DEBUG{reset} {format_colors(message)}\n")
-
-    def info(self, message):
-        self.call(Logger.INFO, f"{blue}{bold}INFO{reset} {format_colors(message)}\n")
-
-    def warning(self, message):
-        self.call(
-            Logger.WARNING, f"{yellow}{bold}WARNING{reset} {format_colors(message)}\n"
-        )
-
-    def error(self, message):
-        self.call(Logger.ERROR, f"{red}{bold}ERROR{reset} {format_colors(message)}\n")
-
-    def fatal(self, message):
-        self.call(Logger.FATAL, f"{red}{bold}FATAL{reset} {format_colors(message)}\n")
-
-
-# Transform nodes
-class NodeTransform:
-    expression_regex = re.compile("{([a-zA-Z0-9.*/+-^()\"' ]+)}")
-    expression_vars_regex = re.compile("([a-zA-Z]+)")
-    greater_regex = re.compile("\sgreater\s")
-    smaller_regex = re.compile("\ssmaller\s")
-
-    # Constructor
-    def __init__(self, root):
-        self.root = root
-        self.vars = {}
-
-    # Stringify a value
-    def stringify(self, object):
-        if isinstance(object, float):
-            return f"{object:10.3f}".strip()
-        else:
-            return str(object)
-
-    # Execute an expression
-    def exec_expression(self, exp):
-        exp = self.greater_regex.sub(">", exp)
-        exp = self.smaller_regex.sub("<", exp)
-
-        exp_vars = self.expression_vars_regex.finditer(exp)
-
-        endidx = 0
-        txt = ""
-        for var in exp_vars:
-            txt += exp[endidx : var.start(0)]
-            endidx = var.end(0)
-            var = var.group(1)
-
-            print
-
-            if var in self.vars:
-                txt += str(self.vars[var])
-            else:
-                logger.debug(f"Variable §o'{var}'§R not found! Inserting as text...")
-                txt += var
-
-        txt += exp[endidx:]
-
-        try:
-            return eval(txt)
-        except Exception as e:
-            logger.fatal(f"Error while evaluating expression §o'{txt}'§R: {e}")
-            sys.exit(1)
-
-    # Repeat component
-    def comp_repeat(self, node, parent, before):
-        if node.hasAttributes():
-            attr = node.attributes.item(0)
-            var = attr.name.strip()
-            range = attr.value.strip()
-            start, end, step = range.split(";")
-
-            start = float(start)
-            end = float(end)
-            step = float(step)
-
-            drc = start <= end
-
-            self.vars[var] = start
-            while self.vars[var] <= end if drc else self.vars[var] >= end:
-                for child in list(node.childNodes):
-                    clone = child.cloneNode(True)
-                    transformed = self.transform_node(clone, parent, node)
-
-                    if transformed:
-                        parent.insertBefore(transformed, before if before else node)
-
-                self.vars[var] += step
-        else:
-            logger.warning("Repeat component should have attributes! Skipping...")
-
-        if not before:
-            parent.removeChild(node)
-
-    # Define component
-    def comp_define(self, node, parent, before):
-        if node.hasAttributes():
-            attrs = node.attributes
-            for i in range(0, attrs.length):
-                attr = attrs.item(i)
-                var = attr.name
-                value = attr.value
-
-                if value.isnumeric():
-                    self.vars[var] = float(value)
-                else:
-                    self.vars[var] = value
-
-                logger.debug(f"Defined variable §o'{var}'§R with value §o'{value}'§R")
-        else:
-            logger.warning("Define component should have attributes! Skipping...")
-
-        if not before:
-            parent.removeChild(node)
-
-    # If component
-    def comp_if(self, node, parent, before):
-        condition = node.getAttribute("cond").strip()
-
-        result = self.exec_expression(condition)
-
-        if isinstance(result, bool):
-            if result:
-                for child in list(node.childNodes):
-                    clone = child.cloneNode(True)
-                    transformed = self.transform_node(clone, parent, node)
-
-                    if transformed:
-                        parent.insertBefore(transformed, before if before else node)
-        else:
-            logger.warning(
-                f"If condition §o'{condition}'§R didn't return a boolean value! Ignoring..."
-            )
-
-        if not before:
-            parent.removeChild(node)
-
-    # The available components
-    components = {"if": comp_if, "repeat": comp_repeat, "define": comp_define}
-
-    # Transform a node
-    def transform_node(self, node, parent, before):
-        if node.nodeType == node.TEXT_NODE:
-            node.data = node.data.strip()
-            return
-
-        if node.nodeType == node.COMMENT_NODE:
-            if not before:
-                parent.removeChild(node)
-            return
-
-        if node.hasAttributes():
-            attrs = node.attributes
-            for i in range(0, attrs.length):
-                attr = attrs.item(i)
-                val = attr.value
-
-                res = self.expression_regex.finditer(attr.value)
-
-                endidx = 0
-                txt = ""
-                for exp in res:
-                    txt += val[endidx : exp.start(0)]
-                    endidx = exp.end(0)
-                    exp = exp.group(1)
-
-                    txt += self.stringify(self.exec_expression(exp))
-
-                attr.value = txt + val[endidx:]
-
-        if node.nodeName in self.components:
-            return self.components[node.nodeName](self, node, parent, before)
-        elif node.hasChildNodes():
-            for child in list(node.childNodes):
-                self.transform_node(child, node, before)
-
-        return node
-
-    def transform(self):
-        self.transform_node(self.root, self.root, None)
-
-
 # Compile a file
 def compile(src, dest):
-    start = time()
+    start = time.time()
 
     doc = minidom.parse(src)
 
     root = doc.documentElement
 
-    transformer = NodeTransform(root)
+    transformer = NodeTransform(doc, root)
     transformer.transform()
 
-    doc.documentElement.writexml(dest)
+    pretty_xml = root.toprettyxml(
+        newl=Settings.newl, indent=Settings.indent
+    )
+    if Settings.newl != "":
+        pretty_xml = os.linesep.join(
+            [s for s in pretty_xml.split(Settings.newl) if s.strip()]
+        )
+    dest.write(pretty_xml)
 
     doc.unlink()
 
-    return time() - start
+    return time.time() - start
+
+
+# Compile command
+def cmd_compile():
+    try:
+        output_stream = open(Settings.output, "w") if Settings.output else sys.stdout
+
+        Logger.logger.info(
+            f"Compiling §o'{Settings.input}'§R to §o'{Settings.output if Settings.input else 'stdout'}'§R"
+        )
+
+        took = compile(Settings.input, output_stream)
+        
+        if not Settings.output:
+            print()
+
+        Logger.logger.info(f"Compilation took §o{round(took * 1000)} ms§R.")
+    except Exception as e:
+        Logger.logger.exit_fatal(f"Error occured while compiling: {e}")
 
 
 # Print the logo
@@ -375,73 +116,147 @@ class help_formatter(HelpFormatter):
             )
 
 
+def unescape_string(string):
+    return string.encode("latin-1", "backslashreplace").decode("unicode-escape")
+
+
+class WatchHandler(FileSystemEventHandler):
+    compiling = False
+
+    @staticmethod
+    def on_any_event(event):
+        if event.is_directory:
+            return None
+        elif event.event_type == 'modified':
+            if not WatchHandler.compiling and event.src_path.split(".").pop() in Settings.ext:
+                Logger.logger.warning("File updated! Recompiling...")
+                WatchHandler.compiling = True
+                cmd_compile()
+                WatchHandler.compiling = False
+              
+
+
 # Main function
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(
-        description="Process some integers.", formatter_class=help_formatter
+        description="Process ReSVG files.", formatter_class=help_formatter
     )
 
-    parser.add_argument("--log", dest="log", help="specify a log file", type=str)
+    args = {
+        "input;i": ["the input file", str],
+        "output;o": ["the output file", str],
+        "compile;c": ["compile a file", "store_true"],
+        "watch;w": ["watch a file and compile on change", str],
+        "version;v": ["show the version", "store_true"],
+        "silent;s": ["run in silent mode", "store_true"],
+        "pretty;p": ["pretty print the svg", "store_true"],
+        "only-errors;e": ["only print errors and fatals", "store_true"],
+        "log": ["specify a log file", str],
+        "level": ["specify a log level", int, 0],
+        "indent": ["specify the indentation", int],
+        "newl": ["specify the newline character", str],
+        "ext": ["specify the extensions which will be watched", str, "rsvg"],
+        "trust-exp": ["enable trust for expressions", "store_true"],
+        "trust-stmt": ["enable trust for statements", "store_true"],
+        "trust": ["enable trust for statements and expressions", "store_true"],
+        "hide-logo": ["hide logo", "store_true"],
+        "comments": ["keep the comments from the ReSVG file", "store_true"],
+    }
 
-    parser.add_argument(
-        "--level", dest="level", help="specify a log level", type=int, default=0
-    )
-
-    parser.add_argument(
-        "-s", "--silent", dest="silent", help="run in silent mode", action="store_true"
-    )
-    parser.add_argument(
-        "-c",
-        "--compile",
-        dest="compile",
-        help="compile input file",
-        action="store_true",
-    )
-    parser.add_argument(
-        "-v", "--version", dest="version", help="show the version", action="store_true"
-    )
-
-    parser.add_argument("-i", "--input", dest="input", help="the input file", type=str)
-    parser.add_argument(
-        "-o", "--output", dest="output", help="the output file", type=str
-    )
+    for arg, info in args.items():
+        parts = arg.split(";")
+        kwargs = {
+            "help": info[0],
+        }
+        kwargs["action" if isinstance(info[1], str) else "type"] = info[1]
+        kwargs["default"] = info[2] if len(info) > 2 else None
+        kwargs["dest"] = parts[0].replace("-", "_")
+        if len(parts) == 2:
+            parser.add_argument(f"-{parts[1]}", f"--{parts[0]}", **kwargs)
+        else:
+            parser.add_argument(f"--{parts[0]}", **kwargs)
 
     args = parser.parse_args()
 
-    loglevel = args.level
+    loglevel = Logger.ERROR if args.only_errors else args.level
 
     std_logger = None
     if not args.silent:
-        std_logger = PrettyLogger(loglevel, sys.stdout)
+        std_logger = PrettyLogger(loglevel, sys.stdout, False)
 
     file_logger = None
     if args.log:
-        file_logger = SimpleLogger(loglevel, open(args.log, "a"))
+        file_logger = SimpleLogger(loglevel, open(args.log, "a"), args.silent)
 
-    logger = CombinedLogger([file_logger, std_logger])
+    Logger.logger = CombinedLogger([file_logger, std_logger])
+
+    Settings.input = args.input
+    Settings.output = args.output
+    Settings.trust_exp = args.trust_exp or args.trust
+    Settings.trust_stmt = args.trust_stmt or args.trust
+    Settings.pretty = args.pretty
+    Settings.ext = args.ext.split(",")
+    Settings.newl = (
+        "\n"
+        if args.pretty and args.newl == None
+        else unescape_string(args.newl)
+        if args.newl
+        else ""
+    )
+    Settings.indent = " " * (
+        4 if args.pretty and args.indent == None else args.indent if args.indent else 0
+    )
+    Settings.comments = args.pretty or args.comments
+    Settings.hide_logo = args.silent or args.only_errors or args.hide_logo
 
     if args.version:
         cmd_version()
         sys.exit(0)
 
-    if args.compile:
-        if not args.silent:
+    if args.watch:
+        Settings.fatal_exit = False
+
+        if not Settings.hide_logo:
             print_logo()
 
-        input_file = args.input
-        output_file = args.output
+        if args.input and os.path.exists(args.input) \
+        and args.watch and os.path.exists(args.watch):
+            observer = Observer()
 
-        output_stream = open(output_file, "w") if output_file else sys.stdout
+            observer.schedule(WatchHandler(), args.watch, recursive = True)
+            ext_str = '§g, §y\'.'.join(Settings.ext)
+            Logger.logger.info(f"Watching §o'{args.watch}'§R for changes on §g[§y\'.{ext_str}\'§g]§R...")
 
-        logger.info(
-            f"Compiling §o'{input_file}'§R to §o'{output_file if output_file else 'stdout'}'§R"
-        )
+            cmd_compile()
 
-        took = compile(input_file, output_stream)
+            observer.start()
 
-        if not output_file:
-            print()
+            try:
+                while True:
+                    time.sleep(5)
+            except KeyboardInterrupt:
+                observer.stop()
+                Logger.logger.info("Observer stopped.")
 
-        logger.info(f"Compilation took §o{round(took * 1000)} ms.§R")
+            observer.join()
+        else:
+            if args.input:
+                Logger.logger.exit_fatal("Input file not found.")
+            else:
+                Logger.logger.exit_fatal("No input file specified")
 
         sys.exit(0)
+
+    if args.compile:
+        if not Settings.hide_logo:
+            print_logo()
+
+        cmd_compile()
+
+        sys.exit(0)
+
+    parser.print_help()
+
+
+if __name__ == "__main__":
+    main()

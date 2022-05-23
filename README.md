@@ -84,6 +84,57 @@ Log to a file:
 resvg --log myfile.log
 ```
 
+Only display the errors:
+
+```sh
+resvg --compile --only-errors -i input.rsvg
+```
+
+Pretty print the xml:
+
+```sh
+resvg --compile --pretty -i input.rsvg
+```
+
+Trust statements:
+
+```sh
+resvg --trust-stmt
+```
+
+Trust expressions:
+
+```sh
+resvg --trust-exp
+```
+
+Trust expressions and statements:
+
+```sh
+resvg --trust
+```
+
+Hide the logo:
+
+```sh
+resvg --hide-logo
+```
+
+Specify the newline character:
+```sh
+resvg --newl "\n"
+```
+
+Specify the indent space count:
+```sh
+resvg --indent 4
+```
+
+Keep the comments:
+```sh
+resvg --comments
+```
+
 Specify the logging level:
 
 ```sh
