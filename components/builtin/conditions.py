@@ -4,7 +4,7 @@ from components.expression import Expression
 
 
 class IfComponent(Component):
-    arguments = {"cond": Expression[bool]}
+    arguments = {"cond": Expression(bool)}
 
     def run(self, args):
         if args["cond"]:

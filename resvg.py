@@ -14,7 +14,7 @@
 
 
 # Details
-version = "0.0.0alpha1"
+version = "0.0.0alpha2"
 authors = ["KotwOSS"]
 license = "MIT"
 year = 2022
@@ -22,13 +22,14 @@ year = 2022
 from util import *
 from components import *
 
-
 # Import the required modules
 try:
+    from watchdog.observers import Observer
+    from watchdog.events import FileSystemEventHandler
     import sys, argparse
     from argparse import HelpFormatter
     from xml.dom import minidom
-    from time import time
+    import time
     from argparse import SUPPRESS
 except ImportError as e:
     print(f"{red}ERROR{reset} missing required module: {e}")
@@ -36,16 +37,16 @@ except ImportError as e:
 
 # Compile a file
 def compile(src, dest):
-    start = time()
+    start = time.time()
 
     doc = minidom.parse(src)
 
     root = doc.documentElement
 
-    transformer = NodeTransform(root)
+    transformer = NodeTransform(doc, root)
     transformer.transform()
 
-    pretty_xml = doc.documentElement.toprettyxml(
+    pretty_xml = root.toprettyxml(
         newl=Settings.newl, indent=Settings.indent
     )
     if Settings.newl != "":
@@ -56,7 +57,26 @@ def compile(src, dest):
 
     doc.unlink()
 
-    return time() - start
+    return time.time() - start
+
+
+# Compile command
+def cmd_compile():
+    try:
+        output_stream = open(Settings.output, "w") if Settings.output else sys.stdout
+
+        Logger.logger.info(
+            f"Compiling §o'{Settings.input}'§R to §o'{Settings.output if Settings.input else 'stdout'}'§R"
+        )
+
+        took = compile(Settings.input, output_stream)
+        
+        if not Settings.output:
+            print()
+
+        Logger.logger.info(f"Compilation took §o{round(took * 1000)} ms§R.")
+    except Exception as e:
+        Logger.logger.exit_fatal(f"Error occured while compiling: {e}")
 
 
 # Print the logo
@@ -100,6 +120,22 @@ def unescape_string(string):
     return string.encode("latin-1", "backslashreplace").decode("unicode-escape")
 
 
+class WatchHandler(FileSystemEventHandler):
+    compiling = False
+
+    @staticmethod
+    def on_any_event(event):
+        if event.is_directory:
+            return None
+        elif event.event_type == 'modified':
+            if not WatchHandler.compiling and event.src_path.split(".").pop() in Settings.ext:
+                Logger.logger.warning("File updated! Recompiling...")
+                WatchHandler.compiling = True
+                cmd_compile()
+                WatchHandler.compiling = False
+              
+
+
 # Main function
 def main():
     parser = argparse.ArgumentParser(
@@ -110,6 +146,7 @@ def main():
         "input;i": ["the input file", str],
         "output;o": ["the output file", str],
         "compile;c": ["compile a file", "store_true"],
+        "watch;w": ["watch a file and compile on change", str],
         "version;v": ["show the version", "store_true"],
         "silent;s": ["run in silent mode", "store_true"],
         "pretty;p": ["pretty print the svg", "store_true"],
@@ -118,6 +155,7 @@ def main():
         "level": ["specify a log level", int, 0],
         "indent": ["specify the indentation", int],
         "newl": ["specify the newline character", str],
+        "ext": ["specify the extensions which will be watched", str, "rsvg"],
         "trust-exp": ["enable trust for expressions", "store_true"],
         "trust-stmt": ["enable trust for statements", "store_true"],
         "trust": ["enable trust for statements and expressions", "store_true"],
@@ -152,9 +190,12 @@ def main():
 
     Logger.logger = CombinedLogger([file_logger, std_logger])
 
+    Settings.input = args.input
+    Settings.output = args.output
     Settings.trust_exp = args.trust_exp or args.trust
     Settings.trust_stmt = args.trust_stmt or args.trust
     Settings.pretty = args.pretty
+    Settings.ext = args.ext.split(",")
     Settings.newl = (
         "\n"
         if args.pretty and args.newl == None
@@ -172,25 +213,45 @@ def main():
         cmd_version()
         sys.exit(0)
 
+    if args.watch:
+        Settings.fatal_exit = False
+
+        if not Settings.hide_logo:
+            print_logo()
+
+        if args.input and os.path.exists(args.input) \
+        and args.watch and os.path.exists(args.watch):
+            observer = Observer()
+
+            observer.schedule(WatchHandler(), args.watch, recursive = True)
+            ext_str = '§g, §y\'.'.join(Settings.ext)
+            Logger.logger.info(f"Watching §o'{args.watch}'§R for changes on §g[§y\'.{ext_str}\'§g]§R...")
+
+            cmd_compile()
+
+            observer.start()
+
+            try:
+                while True:
+                    time.sleep(5)
+            except KeyboardInterrupt:
+                observer.stop()
+                Logger.logger.info("Observer stopped.")
+
+            observer.join()
+        else:
+            if args.input:
+                Logger.logger.exit_fatal("Input file not found.")
+            else:
+                Logger.logger.exit_fatal("No input file specified")
+
+        sys.exit(0)
+
     if args.compile:
         if not Settings.hide_logo:
             print_logo()
 
-        input_file = args.input
-        output_file = args.output
-
-        output_stream = open(output_file, "w") if output_file else sys.stdout
-
-        Logger.logger.info(
-            f"Compiling §o'{input_file}'§R to §o'{output_file if output_file else 'stdout'}'§R"
-        )
-
-        took = compile(input_file, output_stream)
-
-        if not output_file:
-            print()
-
-        Logger.logger.info(f"Compilation took §o{round(took * 1000)} ms.§R")
+        cmd_compile()
 
         sys.exit(0)
 

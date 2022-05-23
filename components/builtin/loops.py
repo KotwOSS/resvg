@@ -3,11 +3,11 @@ from components import register_component
 from components.component import Component
 from components.expression import Expression, Raw, RawExpression
 from components.statement import RawStatement
-from util.logging import Logger
+from components.logging import Logger
 
 
 class RepeatComponent(Component):
-    arguments = {"*:1": Expression[int]}
+    arguments = {"*:1": Expression(int)}
 
     def run(self, args):
         nodes = self.childnodes()
@@ -30,7 +30,7 @@ register_component("repeat", RepeatComponent)
 
 
 class WhileComponent(Component):
-    arguments = {"cond": RawExpression[str]}
+    arguments = {"cond": RawExpression(str)}
 
     def run(self, args):
         nodes = self.childnodes()
@@ -46,7 +46,7 @@ register_component("while", WhileComponent)
 
 
 class ForComponent(Component):
-    arguments = {"*:1": Raw[str]}
+    arguments = {"*:1": Raw(str)}
 
     def run(self, args):
         nodes = self.childnodes()
@@ -58,16 +58,16 @@ class ForComponent(Component):
         segments = statement.value.split(";")
 
         if len(segments) == 3:
-            start = RawExpression[Any](self.transformer).parse(segments[0]).eval()
-            cond = RawExpression[bool](self.transformer).parse(segments[1])
-            after = RawStatement(self.transformer).parse(segments[2])
+            start = RawExpression(Any).parse(segments[0], self.transformer).eval()
+            cond = RawExpression(bool).parse(segments[1], self.transformer)
+            after = RawStatement().parse(segments[2], self.transformer)
 
             self.transformer.set_var(variable, start)
             while cond.eval():
                 self.insert_nodes_before(nodes)
                 after.exec()
         elif len(segments) == 1:
-            range_val = RawExpression[range](self.transformer).parse(segments[0]).eval()
+            range_val = RawExpression(range).parse(segments[0], self.transformer).eval()
 
             for i in range_val:
                 self.transformer.set_var(variable, i)

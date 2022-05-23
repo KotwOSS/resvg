@@ -1,0 +1,28 @@
+<comp name="graph">
+    <run>
+loc = locals()
+if not "width" in loc: width=100
+if not "height" in loc: height=100
+if not "xstart" in loc: xstart=-100
+if not "xend" in loc: xend=100
+if not "xstep" in loc: xstep=2
+if not "exp" in loc: exp="math.sin(x/10)"
+if not "ystart" in loc: ystart=-100
+if not "yend" in loc: yend=100
+if not "fill" in loc: fill="white"
+if not "stroke" in loc: stroke="black"
+if not "ypadding" in loc: ypadding=5
+
+xdiff = xend - xstart
+ydiff = yend - ystart
+strokewidth = height * 0.02
+maxx = width
+maxy = height - ypadding*2
+    </run>
+    <rect x="0" y="0" width="{width}" height="{height}" fill="{fill}"/>
+    <pather stroke="{stroke}" fill="none" stroke-width="{strokewidth}">
+        <for x="xstart; x - xstep smequal xend; x += xstep">
+            <line tx="(x - xstart) / xdiff * maxx" ty="(1 - (({exp}) - ystart) / ydiff)*maxy + ypadding" />
+        </for>
+    </pather>
+</comp>

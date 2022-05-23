@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Dict
 
-from util.logging import Logger
+from components.logging import Logger
 
 # Component class
 class Component(ABC):
@@ -12,6 +12,20 @@ class Component(ABC):
         self.parent = parent
         self.before = before
         self.transformer = transformer
+
+    def stringify(self, val: Any):
+        """Stringify a value"""
+        if isinstance(val, str):
+            return val
+        elif isinstance(val, int):
+            return str(val)
+        elif isinstance(val, float):
+            if val.is_integer():
+                return str(int(val))
+            else: 
+                return str(float(f"{val:10.3f}"))
+        else:
+            return str(val)
 
     def destroy(self):
         """Destroy the component"""
@@ -42,8 +56,12 @@ class Component(ABC):
         """Insert a node before the component"""
         if node:
             return self.parent.insertBefore(
-                node, self.before if self.before else self.node
+                node, self.get_before()
             )
+
+    def get_before(self):
+        """Return the node before which the component should be inserted"""
+        return self.before if self.before else self.node
 
     def insert_nodes_before(self, nodes):
         """Insert a list of nodes before the component. (This will clone the nodes)"""
@@ -54,21 +72,19 @@ class Component(ABC):
     def transform_node(self, node):
         """Transform a node"""
         return self.transformer.transform_node(
-            node, self.parent, self.before if self.before else self.node
+            node, self.parent, self.get_before()
         )
 
     def transform(self) -> Any:
         attributes = self.node.attributes
         args: Dict[str, Any] = {}
-        for (attrname, valtype) in self.arguments.items():
-            instance = valtype(self.transformer)
-
+        for (attrname, instance) in self.arguments.items():
             if attrname.startswith("*"):
                 attrval = []
                 for i in range(attributes.length):
                     attr = attributes.item(i)
                     if attr.name not in args:
-                        attrval.append(Argument.from_attr(attr, instance))
+                        attrval.append(Argument.from_attr(attr, instance, self.transformer))
                 args["*"] = attrval
                 if len(attrname) > 1:
                     last = attrname[-1:]
@@ -89,11 +105,14 @@ class Component(ABC):
                             f"Expected §o'{expected_count}'{last if min_or_max else ''}§R arguments for component §o'{type(self).__name__}'§R but found §o'{count}'§R!"
                         )
             else:
+                optional = attrname.startswith("?")
+                if optional: attrname = attrname[1:]
+
                 attr = attributes.getNamedItem(attrname)
                 if attr:
-                    attrval = instance.parse(attr.value)
+                    attrval = instance.parse(attr.value, self.transformer)
                     args[attrname] = attrval
-                else:
+                elif not optional:
                     Logger.logger.exit_fatal(
                         f"Component §o'{type(self).__name__}'§R has to have attribute §o'{attrname}'§R!"
                     )
@@ -110,5 +129,5 @@ class Argument:
         self.name = name
         self.value = value
 
-    def from_attr(attr, instance):
-        return Argument(attr.name, instance.parse(attr.value))
+    def from_attr(attr, instance, transformer):
+        return Argument(attr.name, instance.parse(attr.value, transformer))

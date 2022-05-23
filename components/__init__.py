@@ -1,6 +1,7 @@
+from .settings import *
+from .logging import *
 from .component import *
 from .expression import *
-from .settings import *
 
 components: Dict[str, Component] = {}
 

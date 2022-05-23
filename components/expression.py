@@ -1,85 +1,65 @@
 import math, re, random
-from typing import Any, Generic, TypeVar
+from typing import Any
 from components.settings import Settings
 
-from util.logging import Logger
+from components.logging import Logger
+from components.statement import RawStatement
 
-# Expression class
-T = TypeVar("T")
+class MultiExpression:
+    def __init__(self, *kwargs) -> None:
+        self.types = kwargs
+
+    def parse(self, exp: str, transformer):
+        exps = exp.split(";")
+
+        if hasattr(self, "__orig_class__"):
+            if len(self.types) == len(exps):
+                for i in range(0, len(exps)):
+                    exps[i] = RawExpression(self.types[i]).parse(exps[i], transformer).eval()
+            else:
+                Logger.logger.exit_fatal(
+                    f"Invalid number of arguments for multi expression! Expected {len(self.types)} but got {len(exps)}!"
+                )
+
+        return exps
 
 
-class Expression(Generic[T]):
-    greater_regex = re.compile("\sgreater\s")
-    smaller_regex = re.compile("\ssmaller\s")
-    expression_globals = {
-        "__import__": None,
-        "open": None,
-        "exec": None,
-        "eval": None,
-        "math": math,
-        "random": random,
-    }
+class Expression:
+    def __init__(self, type) -> None:
+        self.type = type
 
-    def __init__(self, transformer) -> None:
-        super().__init__()
-
-        self.transformer = transformer
-
-    def parse(self, exp: str) -> T:
+    def parse(self, exp: str, transformer):
         return (
-            RawExpression[
-                self.__orig_class__.__args__[0]
-                if hasattr(self, "__orig_class__")
-                and len(self.__orig_class__.__args__) >= 1
-                else None
-            ](self.transformer)
-            .parse(exp)
+            RawExpression(self.type)
+            .parse(exp, transformer)
             .eval()
         )
 
+class RawExpression:
+    def __init__(self, type) -> None:
+        self.type = type
 
-class RawExpression(Generic[T]):
-    greater_regex = re.compile("\sgreater\s")
-    smaller_regex = re.compile("\ssmaller\s")
-    expression_globals = {
-        "__import__": None,
-        "open": None,
-        "exec": None,
-        "eval": None,
-        "math": math,
-        "random": random,
-    }
-
-    def __init__(self, transformer) -> None:
-        super().__init__()
-
-        self.transformer = transformer
-
-    def parse(self, exp: str):
+    def parse(self, exp: str, transformer):
         self.exp = exp.strip()
+        self.transformer = transformer
         return self
 
-    def eval(self) -> T:
+    def eval(self) -> Any:
         if not Settings.trust_exp:
             Logger.logger.exit_fatal(
                 "Expression trust mode not enabled but code contains expressions! Perhaps you might wanna add the §o--trust-exp§R switch to your command line?"
             )
 
-        self.exp = self.greater_regex.sub(">", self.exp)
-        self.exp = self.smaller_regex.sub("<", self.exp)
-
         try:
-            val = eval(self.exp, self.expression_globals, self.transformer.vars)
-            if (
-                hasattr(self, "__orig_class__")
-                and len(self.__orig_class__.__args__) >= 1
-            ):
-                expected_type = self.__orig_class__.__args__[0]
-                if expected_type == Any or isinstance(val, expected_type):
+            val = eval(RawStatement.transform(self.exp), RawStatement.globals, self.transformer.vars)
+            if self.type:
+                if self.type == Any or isinstance(val, self.type):
                     return val
+                elif self.type == float and isinstance(val, int):
+                    return float(val)
                 else:
                     Logger.logger.exit_fatal(
-                        f"Mismatched expression result! Expected type §o'{expected_type}'§R!"
+                        f"Mismatched expression result! Expected type §o'{self.type}'§R!"
                     )
             else:
                 Logger.logger.exit_fatal(
@@ -91,30 +71,23 @@ class RawExpression(Generic[T]):
             )
 
 
-# Raw class
-T = TypeVar("T")
+class Raw:
+    def __init__(self, type) -> None:
+        self.type = type
 
-
-class Raw(Generic[T]):
-    def __init__(self, transformer) -> T:
-        super().__init__()
-
-        self.transformer = transformer
-
-    def parse(self, val: str) -> T:
+    def parse(self, val: str, transformer) -> Any:
         try:
-            expected_type = self.__orig_class__.__args__[0]
-            if expected_type == str:
+            if self.type == str:
                 return val
-            elif expected_type == int:
+            elif self.type == int:
                 return int(val)
-            elif expected_type == float:
+            elif self.type == float:
                 return float(val)
             else:
                 Logger.logger.exit_fatal(
-                    f"Unknown expected raw type §o'{expected_type}'§R!"
+                    f"Unknown raw type §o'{self.type}'§R!"
                 )
         except Exception as e:
             Logger.logger.exit_fatal(
-                f"Error while parsing value §o'{val}' to raw type {expected_type}§R: {e}"
+                f"Error while parsing value §o'{val}' to raw type {self.type}§R: {e}"
             )

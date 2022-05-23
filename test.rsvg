@@ -1,25 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg">
-    <comp name="greet">
-        <!-- KEKW -->
-        <slot/>
-        <repeat _="10">
-            <h1>Hello, ${name}!</h1>
-        </repeat>
-        <slot />  
-    </comp>
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+    <include path="graph.rsvg" />
 
-
-    <greet name="Ricky">
-        <p>This will be displayed before and after the greeting</p>
-    </greet>
-
-    <greet name="keky">
-        <p>This will be displayed before and after the greeting</p>
-    </greet>
-
-    <g>
-        <for i="0; i smaller 10; i += 1">
-            <p>${i}</p>
-        </for>
-    </g>
+    <graph 
+        exp="'sin(x)'"
+        height="20"
+        ystart="-1"
+        yend="1"
+        ypadding="1"
+        xstart="0"
+        xend="20*math.pi"
+        xstep="0.1"
+    />
 </svg>

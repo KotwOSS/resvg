@@ -2,7 +2,7 @@ import re
 from typing import Any
 
 from components.settings import Settings
-from util.logging import Logger
+from components.logging import Logger
 from util.regex import multi_replace
 from .expression import RawExpression
 from . import components
@@ -12,11 +12,13 @@ class NodeTransform:
     expression_regex = re.compile(r"{([a-zA-Z0-9.*/+-^()\"' ]+)}")
     text_expression_regex = re.compile(r"\${([a-zA-Z0-9.*/+-^()\"' ]+)}")
     # Constructor
-    def __init__(self, root):
+    def __init__(self, doc, root):
         self.root = root
+        self.doc = doc
         self.vars = {}
         self.comps = {}
         self.slots = []
+        self.paths = []
 
     # Stringify a value
     def stringify(self, object):
@@ -48,6 +50,20 @@ class NodeTransform:
     def get_slot(self):
         return self.slots[-1] if len(self.slots) > 0 else None
 
+    def transform_attributes(self, node):
+        if node.hasAttributes():
+            attrs = node.attributes
+            for i in range(0, attrs.length):
+                attr = attrs.item(i)
+
+                attr.value = multi_replace(
+                    attr.value.strip(),
+                    self.expression_regex,
+                    lambda exp: self.stringify(
+                        RawExpression(Any).parse(exp.group(1), self).eval()
+                    ),
+                )
+
     # Transform a node
     def transform_node(self, node, parent, before):
         if node.nodeType == node.TEXT_NODE:
@@ -55,7 +71,7 @@ class NodeTransform:
                 node.data.strip(),
                 self.text_expression_regex,
                 lambda exp: self.stringify(
-                    RawExpression[Any](self).parse(exp.group(1)).eval()
+                    RawExpression(Any).parse(exp.group(1), self).eval()
                 ),
             )
             return node
@@ -68,18 +84,7 @@ class NodeTransform:
             else:
                 return node
 
-        if node.hasAttributes():
-            attrs = node.attributes
-            for i in range(0, attrs.length):
-                attr = attrs.item(i)
-
-                attr.value = multi_replace(
-                    attr.value.strip(),
-                    self.expression_regex,
-                    lambda exp: self.stringify(
-                        RawExpression[Any](self).parse(exp.group(1)).eval()
-                    ),
-                )
+        self.transform_attributes(node)
 
         if node.nodeName in components:
             return components[node.nodeName](node, parent, before, self).transform()
@@ -89,7 +94,7 @@ class NodeTransform:
             if node.hasAttributes():
                 for i in range(0, node.attributes.length):
                     attr = node.attributes.item(i)
-                    self.set_var(attr.name, attr.value)
+                    self.set_var(attr.name, RawExpression(Any).parse(attr.value, self).eval())
 
             nodes = self.comps[node.nodeName]
             for child in nodes:

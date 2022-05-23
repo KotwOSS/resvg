@@ -2,7 +2,7 @@ from components import register_component
 from components.component import Component
 from components.expression import Expression
 from components.statement import RawStatement
-from util.logging import Logger
+from components.logging import Logger
 
 
 class RunComponent(Component):
@@ -19,7 +19,7 @@ class RunComponent(Component):
             else:
                 Logger.logger.exit_fatal(f"Run component may only contain text!")
 
-        RawStatement(self.transformer).parse(code).execute()
+        RawStatement().parse(code, self.transformer).exec()
 
         self.destroy()
 

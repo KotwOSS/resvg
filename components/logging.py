@@ -1,5 +1,7 @@
 import sys
-from .colors import *
+
+from components.settings import Settings
+from util.colors import *
 
 # Logger class
 class Logger:
@@ -25,7 +27,8 @@ class Logger:
         self.fatal(message)
         if self.silent:
             sys.stderr.write(f"{remove_colors(message)}\n")
-        sys.exit(1)
+        if Settings.fatal_exit:
+            sys.exit(1)
 
 
 # CombinedLogger to combine multiple loggers

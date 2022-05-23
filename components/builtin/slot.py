@@ -1,4 +1,4 @@
-from util.logging import Logger
+from components.logging import Logger
 from components import register_component
 from components.component import Component
 

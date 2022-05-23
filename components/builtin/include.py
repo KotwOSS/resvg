@@ -4,11 +4,11 @@ from xml.dom import minidom
 from components import register_component
 from components.component import Component
 from components.expression import Expression, Raw
-from util.logging import Logger
+from components.logging import Logger
 
 
 class IncludeComponent(Component):
-    arguments = {"path": Raw[str], "*": Expression[Any]}
+    arguments = {"path": Raw(str), "*": Expression(Any)}
 
     def run(self, args):
         path = args["path"]

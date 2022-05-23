@@ -5,3 +5,4 @@ from .slot import *
 from .include import *
 from .fragment import *
 from .comp import *
+from .pather import *
