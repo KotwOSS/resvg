@@ -20,7 +20,7 @@ class RawStatement:
         "random": random,
         "sin": math.sin,
         "cos": math.cos,
-        "tan": math.tan,    
+        "tan": math.tan,
         "asin": math.asin,
         "acos": math.acos,
         "atan": math.atan,

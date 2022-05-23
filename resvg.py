@@ -19,8 +19,8 @@ authors = ["KotwOSS"]
 license = "MIT"
 year = 2022
 
-from util import *
-from components import *
+from .util import *
+from .components import *
 
 # Import the required modules
 try:
@@ -46,9 +46,7 @@ def compile(src, dest):
     transformer = NodeTransform(doc, root)
     transformer.transform()
 
-    pretty_xml = root.toprettyxml(
-        newl=Settings.newl, indent=Settings.indent
-    )
+    pretty_xml = root.toprettyxml(newl=Settings.newl, indent=Settings.indent)
     if Settings.newl != "":
         pretty_xml = os.linesep.join(
             [s for s in pretty_xml.split(Settings.newl) if s.strip()]
@@ -70,7 +68,7 @@ def cmd_compile():
         )
 
         took = compile(Settings.input, output_stream)
-        
+
         if not Settings.output:
             print()
 
@@ -127,13 +125,15 @@ class WatchHandler(FileSystemEventHandler):
     def on_any_event(event):
         if event.is_directory:
             return None
-        elif event.event_type == 'modified':
-            if not WatchHandler.compiling and event.src_path.split(".").pop() in Settings.ext:
+        elif event.event_type == "modified":
+            if (
+                not WatchHandler.compiling
+                and event.src_path.split(".").pop() in Settings.ext
+            ):
                 Logger.logger.warning("File updated! Recompiling...")
                 WatchHandler.compiling = True
                 cmd_compile()
                 WatchHandler.compiling = False
-              
 
 
 # Main function
@@ -219,13 +219,19 @@ def main():
         if not Settings.hide_logo:
             print_logo()
 
-        if args.input and os.path.exists(args.input) \
-        and args.watch and os.path.exists(args.watch):
+        if (
+            args.input
+            and os.path.exists(args.input)
+            and args.watch
+            and os.path.exists(args.watch)
+        ):
             observer = Observer()
 
-            observer.schedule(WatchHandler(), args.watch, recursive = True)
-            ext_str = '§g, §y\'.'.join(Settings.ext)
-            Logger.logger.info(f"Watching §o'{args.watch}'§R for changes on §g[§y\'.{ext_str}\'§g]§R...")
+            observer.schedule(WatchHandler(), args.watch, recursive=True)
+            ext_str = "§g, §y'.".join(Settings.ext)
+            Logger.logger.info(
+                f"Watching §o'{args.watch}'§R for changes on §g[§y'.{ext_str}'§g]§R..."
+            )
 
             cmd_compile()
 

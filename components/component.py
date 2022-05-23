@@ -22,7 +22,7 @@ class Component(ABC):
         elif isinstance(val, float):
             if val.is_integer():
                 return str(int(val))
-            else: 
+            else:
                 return str(float(f"{val:10.3f}"))
         else:
             return str(val)
@@ -40,14 +40,14 @@ class Component(ABC):
             Logger.logger.exit_fatal(
                 f"Component §o{type(self).__name__}§R has to have childNodes!"
             )
-    
+
     def childnodes_or_empty(self):
         """Return the child nodes of the component as a list or an empty list"""
         if self.node.hasChildNodes():
             return list(self.node.childNodes)
         else:
             return []
-    
+
     def set_var(self, name, value):
         """Set a variable"""
         self.transformer.set_var(name, value)
@@ -55,9 +55,7 @@ class Component(ABC):
     def insert_before(self, node):
         """Insert a node before the component"""
         if node:
-            return self.parent.insertBefore(
-                node, self.get_before()
-            )
+            return self.parent.insertBefore(node, self.get_before())
 
     def get_before(self):
         """Return the node before which the component should be inserted"""
@@ -71,9 +69,7 @@ class Component(ABC):
 
     def transform_node(self, node):
         """Transform a node"""
-        return self.transformer.transform_node(
-            node, self.parent, self.get_before()
-        )
+        return self.transformer.transform_node(node, self.parent, self.get_before())
 
     def transform(self) -> Any:
         attributes = self.node.attributes
@@ -84,7 +80,9 @@ class Component(ABC):
                 for i in range(attributes.length):
                     attr = attributes.item(i)
                     if attr.name not in args:
-                        attrval.append(Argument.from_attr(attr, instance, self.transformer))
+                        attrval.append(
+                            Argument.from_attr(attr, instance, self.transformer)
+                        )
                 args["*"] = attrval
                 if len(attrname) > 1:
                     last = attrname[-1:]
@@ -106,7 +104,8 @@ class Component(ABC):
                         )
             else:
                 optional = attrname.startswith("?")
-                if optional: attrname = attrname[1:]
+                if optional:
+                    attrname = attrname[1:]
 
                 attr = attributes.getNamedItem(attrname)
                 if attr:

@@ -5,6 +5,7 @@ from components.settings import Settings
 from components.logging import Logger
 from components.statement import RawStatement
 
+
 class MultiExpression:
     def __init__(self, *kwargs) -> None:
         self.types = kwargs
@@ -15,7 +16,9 @@ class MultiExpression:
         if hasattr(self, "__orig_class__"):
             if len(self.types) == len(exps):
                 for i in range(0, len(exps)):
-                    exps[i] = RawExpression(self.types[i]).parse(exps[i], transformer).eval()
+                    exps[i] = (
+                        RawExpression(self.types[i]).parse(exps[i], transformer).eval()
+                    )
             else:
                 Logger.logger.exit_fatal(
                     f"Invalid number of arguments for multi expression! Expected {len(self.types)} but got {len(exps)}!"
@@ -29,11 +32,8 @@ class Expression:
         self.type = type
 
     def parse(self, exp: str, transformer):
-        return (
-            RawExpression(self.type)
-            .parse(exp, transformer)
-            .eval()
-        )
+        return RawExpression(self.type).parse(exp, transformer).eval()
+
 
 class RawExpression:
     def __init__(self, type) -> None:
@@ -51,7 +51,11 @@ class RawExpression:
             )
 
         try:
-            val = eval(RawStatement.transform(self.exp), RawStatement.globals, self.transformer.vars)
+            val = eval(
+                RawStatement.transform(self.exp),
+                RawStatement.globals,
+                self.transformer.vars,
+            )
             if self.type:
                 if self.type == Any or isinstance(val, self.type):
                     return val
@@ -84,9 +88,7 @@ class Raw:
             elif self.type == float:
                 return float(val)
             else:
-                Logger.logger.exit_fatal(
-                    f"Unknown raw type §o'{self.type}'§R!"
-                )
+                Logger.logger.exit_fatal(f"Unknown raw type §o'{self.type}'§R!")
         except Exception as e:
             Logger.logger.exit_fatal(
                 f"Error while parsing value §o'{val}' to raw type {self.type}§R: {e}"

@@ -94,7 +94,9 @@ class NodeTransform:
             if node.hasAttributes():
                 for i in range(0, node.attributes.length):
                     attr = node.attributes.item(i)
-                    self.set_var(attr.name, RawExpression(Any).parse(attr.value, self).eval())
+                    self.set_var(
+                        attr.name, RawExpression(Any).parse(attr.value, self).eval()
+                    )
 
             nodes = self.comps[node.nodeName]
             for child in nodes:
