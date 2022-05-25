@@ -9,20 +9,29 @@ if not "xstep" in loc: xstep=2
 if not "exp" in loc: exp="math.sin(x/10)"
 if not "ystart" in loc: ystart=-100
 if not "yend" in loc: yend=100
-if not "fill" in loc: fill="white"
 if not "stroke" in loc: stroke="black"
-if not "ypadding" in loc: ypadding=5
+if not "ypadding" in loc: ypadding=0
+if not "sx" in loc: sx=0
+if not "sy" in loc: sy=0
+if not "sr" in loc: sr=0
+if not "fill" in loc: fill="white"
 
-xdiff = xend - xstart
-ydiff = yend - ystart
+xdiff = abs(xend - xstart)
+ydiff = abs(yend - ystart)
 strokewidth = height * 0.02
-maxx = width
-maxy = height - ypadding*2
+maxw = width
+maxh = height - ypadding*2
+miny = min(yend, ystart)
+maxy = max(yend, ystart)
     </run>
-    <rect x="0" y="0" width="{width}" height="{height}" fill="{fill}"/>
-    <pather stroke="{stroke}" fill="none" stroke-width="{strokewidth}">
-        <for x="xstart; x - xstep smequal xend; x += xstep">
-            <line tx="(x - xstart) / xdiff * maxx" ty="(1 - (({exp}) - ystart) / ydiff)*maxy + ypadding" />
+    <pather stroke="{stroke}" fill="{fill}" stroke-width="{strokewidth}" transform-origin="{width/2} {height/2}" transform="rotate({sr}) translate({sx}, {sy})">
+        <slot />
+        <line from="xstart / xdiff * maxw;height" />
+        <for x="range(xstart, xstep+xend, xstep)">
+            <line tx="x / xdiff * maxw" ty="(1 - (({exp}) - ystart) / ydiff)*maxh + ypadding" />
         </for>
+        <line to="xend / xdiff * maxw;height" />
+        <line to="xstart / xdiff * maxw;height" />
+        <close />
     </pather>
 </comp>
