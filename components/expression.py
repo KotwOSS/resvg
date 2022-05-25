@@ -7,22 +7,21 @@ from components.statement import RawStatement
 
 
 class MultiExpression:
-    def __init__(self, *kwargs) -> None:
-        self.types = kwargs
+    def __init__(self, *types) -> None:
+        self.types = types
 
     def parse(self, exp: str, transformer):
         exps = exp.split(";")
 
-        if hasattr(self, "__orig_class__"):
-            if len(self.types) == len(exps):
-                for i in range(0, len(exps)):
-                    exps[i] = (
-                        RawExpression(self.types[i]).parse(exps[i], transformer).eval()
-                    )
-            else:
-                Logger.logger.exit_fatal(
-                    f"Invalid number of arguments for multi expression! Expected {len(self.types)} but got {len(exps)}!"
+        if len(self.types) == len(exps):
+            for i in range(0, len(exps)):
+                exps[i] = (
+                    RawExpression(self.types[i]).parse(exps[i], transformer).eval()
                 )
+        else:
+            Logger.logger.exit_fatal(
+                f"Invalid number of arguments for multi expression! Expected {len(self.types)} but got {len(exps)}!"
+            )
 
         return exps
 

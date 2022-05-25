@@ -18,7 +18,7 @@ class NodeTransform:
         self.vars = {}
         self.comps = {}
         self.slots = []
-        self.paths = []
+        self.paths = None
 
     # Stringify a value
     def stringify(self, object):
@@ -66,6 +66,8 @@ class NodeTransform:
 
     # Transform a node
     def transform_node(self, node, parent, before):
+        print("BEFORE: ", before)
+
         if node.nodeType == node.TEXT_NODE:
             node.data = multi_replace(
                 node.data.strip(),
@@ -105,7 +107,10 @@ class NodeTransform:
                     clone, parent, before if before else node
                 )
                 if transformed:
-                    parent.insertBefore(transformed, before if before else node)
+                    if before:
+                        parent.insertBefore(transformed, before)
+                    else:
+                        parent.appendChild(transformed)
 
             if not before:
                 parent.removeChild(node)
@@ -113,7 +118,7 @@ class NodeTransform:
             self.pop_slot()
         elif node.hasChildNodes():
             for child in list(node.childNodes):
-                self.transform_node(child, node, before)
+                self.transform_node(child, node, child)
 
         return node
 

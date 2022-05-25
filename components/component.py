@@ -57,10 +57,6 @@ class Component(ABC):
         if node:
             return self.parent.insertBefore(node, self.get_before())
 
-    def get_before(self):
-        """Return the node before which the component should be inserted"""
-        return self.before if self.before else self.node
-
     def insert_nodes_before(self, nodes):
         """Insert a list of nodes before the component. (This will clone the nodes)"""
         for node in nodes:

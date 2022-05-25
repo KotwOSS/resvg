@@ -10,6 +10,9 @@ class AppendComponent(Component):
     arguments = {"d": Raw(str)}
 
     def run(self, args):
+        if not self.transformer.paths:
+            return
+
         self.transformer.paths.append(args["d"])
 
         self.destroy()
@@ -22,6 +25,9 @@ class CloseComponent(Component):
     arguments = {}
 
     def run(self, args):
+        if self.transformer.paths == None:
+            return
+
         self.transformer.paths.append("Z")
 
         self.destroy()
@@ -41,6 +47,9 @@ class LineComponent(Component):
     }
 
     def run(self, args):
+        if self.transformer.paths == None:
+            return
+
         arg_from = (
             args["from"]
             if "from" in args
@@ -84,19 +93,27 @@ class PatherComponent(Component):
     arguments = {"*": Raw(str)}
 
     def run(self, args):
-        self.insert_nodes_before(self.childnodes())
-
-        # self.transformer.paths.append("Z")
-
+        # self.node.nodeName = "path"
         el = self.transformer.doc.createElement("path")
+        # el = self.node
+
+        if self.transformer.paths == None:
+            self.transformer.paths = []
+
+        for node in self.childnodes():
+            clone = node.cloneNode(True)
+            val = self.transformer.transform_node(clone, el, None)
+            if val:
+                el.appendChild(val)
+
         el.setAttribute("d", " ".join(self.transformer.paths))
 
         for arg in args["*"]:
             el.setAttribute(arg.name, arg.value)
 
-        self.insert_before(el)
+        self.transformer.paths = None
 
-        self.destroy()
+        return el
 
 
 register_component("pather", PatherComponent)
