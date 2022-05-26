@@ -20,7 +20,7 @@ def compile():
             with open(Settings.input, "r") as file:
                 parser = etree.XMLParser(
                     remove_comments=not Settings.comments,
-                    remove_blank_text=not Settings.pretty,
+                    remove_blank_text=True,
                 )
                 parser.feed(file.read())
                 root = parser.close()
@@ -34,12 +34,18 @@ def compile():
                     with open(Settings.output, "wb") as file:
                         file.write(result)
                 else:
-                    print()
+                    if not Settings.silent:
+                        print()
                     print(result.decode("utf-8"))
-                    print()
+                    if not Settings.silent:
+                        print()
             end = time.time()
             took = end - start
-            logging.info("Finished Compiling! Took §o%sms§R", round(took * 1000))
-            print()
+            millis = took * 1000
+            logging.info(
+                "Finished Compiling! Took §o%s§R ms", f"{millis:10.3f}".strip()
+            )
+            if not Settings.silent:
+                print()
     except Exception as e:
-        logging.critical(f"Error occured while compiling: {e}")
+        logging.exception("Error occured while compiling: %s", e)

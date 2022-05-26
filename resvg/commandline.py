@@ -9,7 +9,7 @@ from settings import Settings
 def silent_print_logo():
     """Print the logo if not in silent mode."""
 
-    if not Settings.silent:
+    if not Settings.hide_logo:
         print_logo()
 
 
@@ -17,20 +17,29 @@ def print_logo():
     """Print the logo."""
 
     print(
-        f"""{colors.orange}
+        colors.format(
+            """§o
 ░█▀▀█ █▀▀ ░█▀▀▀█ ░█  ░█ ░█▀▀█ 
 ░█▄▄▀ █▀▀  ▀▀▀▄▄  ░█░█  ░█ ▄▄ 
 ░█ ░█ ▀▀▀ ░█▄▄▄█   ▀▄▀  ░█▄▄█
-    {colors.reset}"""
+    §R"""
+        )
     )
-    print(f"ReSVG version {colors.blue}{Settings.version}{colors.reset}")
+    print(colors.format(f"ReSVG version §b{Settings.version}§R"))
+
     print("\n")
     print(
-        f"Written by {colors.blue}{', '.join(Settings.authors)}{colors.reset} licensed under {colors.blue}{Settings.license}{colors.reset}."
+        colors.format(
+            f"Written by §b{', '.join(Settings.authors)}§R \
+licensed under §b{Settings.license}§R."
+        )
     )
     print("")
     print(
-        f"{colors.red}(c){colors.reset} Copyright {Settings.year} {colors.blue}{', '.join(Settings.authors)}{colors.reset}"
+        colors.format(
+            f"§r(c)§R Copyright {Settings.year} \
+§b{', '.join(Settings.authors)}§R"
+        )
     )
     print("\n")
 
@@ -61,10 +70,11 @@ def parse():
         "output;o": ["the output file", str],
         "compile;c": ["compile a file", "store_true"],
         "watch;w": ["watch a file and compile on change", str],
+        "min-time": ["minimum time between compiles", float, 1.0],
         "version;v": ["show the version", "store_true"],
         "silent;s": ["run in silent mode", "store_true"],
         "pretty;p": ["pretty print the svg", "store_true"],
-        "only-errors;e": ["only print errors and fatals", "store_true"],
+        "no-color": ["disable color", "store_true"],
         "log": ["specify a log file", str],
         "level": ["specify a log level", int, 20],
         "ext": ["specify the extensions which will be watched", str, "rsvg"],
@@ -97,14 +107,16 @@ def parse():
     Settings.pretty = args.pretty
     Settings.ext = args.ext.split(",")
     Settings.comments = args.pretty or args.comments
-    Settings.hide_logo = args.silent or args.only_errors or args.hide_logo
-    Settings.level = logging.ERROR if args.only_errors else args.level
+    Settings.hide_logo = args.silent or args.hide_logo
+    Settings.level = logging.ERROR if args.silent else args.level
     Settings.log = args.log
     Settings.silent = args.silent
     Settings.compile = args.compile
     Settings.watch = args.watch
+    Settings.min_time = args.min_time
+    Settings.no_color = args.no_color
 
-    logger.setup_logger(Settings.level, stdout=not Settings.silent, file=Settings.log)
+    logger.setup_logger()
 
     if Settings.compile:
         silent_print_logo()

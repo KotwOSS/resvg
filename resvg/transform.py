@@ -22,6 +22,7 @@ class Transformer:
     def __init__(self, root: etree._Element):
         self.root = root
         self.queue = list(root.getiterator())
+        self.queue.reverse()
         self.vars = {}
 
     def has_next(self):
@@ -30,7 +31,7 @@ class Transformer:
 
     def next(self):
         """Parse the next item of the queue"""
-        item = self.queue.pop(0)
+        item = self.queue.pop()
         if isinstance(item, etree._Element):
             self.parse_element(item)
         elif isinstance(item, Callable):
@@ -74,7 +75,7 @@ class Transformer:
             logging.debug("queue: run §o%s§R", job.__name__)
         else:
             logging.debug("queue: transform §o%s§R", job.tag)
-        self.queue.insert(0, job)
+        self.queue.append(job)
 
     def transform(self):
         """Transform the tree"""

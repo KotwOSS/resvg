@@ -5,7 +5,6 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from copy import deepcopy
-from inspect import getattr_static
 from typing import Callable, Dict, List, Type
 from lxml import etree
 from evaluator import Evaluator
@@ -53,7 +52,8 @@ class Component(ABC):
 
     def _complete_jobs(self):
         """Append the temporary job queue to the actual job queue. Only call at the end of the job"""
-        for job in self.jobs[::-1]:
+        self.jobs.reverse()
+        for job in self.jobs:
             self.transformer.add_job(job)
         self.jobs = []
 

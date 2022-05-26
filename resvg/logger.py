@@ -2,8 +2,8 @@
 #
 # Copyright (c) 2022 KotwOSS
 
-import logging
-import colors
+import logging, colors
+from settings import Settings
 
 fmt = "%(levelname)s >>§R  %(message)s"
 
@@ -42,18 +42,19 @@ class SimpleFormatter(logging.Formatter):
         return colors.remove_colors(super().format(record))
 
 
-def setup_logger(level: int, stdout: bool = True, file: str | None = None):
+def setup_logger():
     logger = logging.getLogger()
-    logger.setLevel(level)
+    logger.setLevel(Settings.level)
 
-    if stdout:
-        stdout_handler = logging.StreamHandler()
-        stdout_handler.setLevel(level)
-        stdout_handler.setFormatter(PrettyFormatter(fmt))
-        logger.addHandler(stdout_handler)
+    stdout_handler = logging.StreamHandler()
+    stdout_handler.setLevel(Settings.level)
+    stdout_handler.setFormatter(
+        SimpleFormatter(fmt) if Settings.no_color else PrettyFormatter(fmt)
+    )
+    logger.addHandler(stdout_handler)
 
-    if file:
-        file_handler = logging.FileHandler(file)
-        file_handler.setLevel(level)
+    if Settings.log:
+        file_handler = logging.FileHandler(Settings.log)
+        file_handler.setLevel(Settings.level)
         file_handler.setFormatter(SimpleFormatter(fmt))
         logger.addHandler(file_handler)

@@ -3,6 +3,7 @@
 # Copyright (c) 2022 KotwOSS
 
 import re
+from settings import Settings
 
 # colors
 red = "\033[38;2;255;100;100m"
@@ -27,13 +28,19 @@ colors = {
 
 colors_regex = re.compile("§[a-zA-Z]")
 
-# Remove all the color codes in a string
-def remove_colors(text):
+
+def remove_colors(text: str) -> str:
+    """Remove all the color codes in a string"""
     return colors_regex.sub("", text)
 
 
-# Format all the color codes in a string
-def format_colors(text):
+def format_colors(text: str) -> str:
+    """Format all the color codes in a string"""
     for key, value in colors.items():
         text = text.replace(key, value)
     return text
+
+
+def format(text: str):
+    """Format a string with color codes or remove the color codes if Settings.no_color is enabled"""
+    return remove_colors(text) if Settings.no_color else format_colors(text)

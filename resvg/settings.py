@@ -12,10 +12,12 @@ class Settings:
 
     resvg_namespace: str = "{http://oss.kotw.dev/resvg}"
 
+    no_color: bool
     comments: bool
+    min_time: float
     pretty: bool
     compile: bool
-    watch: bool
+    watch: str
     trust_exp: bool
     trust_stmt: bool
     silent: bool
