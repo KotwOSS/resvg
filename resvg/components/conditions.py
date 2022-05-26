@@ -4,20 +4,16 @@
 
 from component import Component
 from expression import Expression
+from lxml import etree
 
 
 class If(Component):
-    use_after = True
     arguments = {
         "cond": (lambda an, av: an == "cond", Expression(bool)),
     }
 
     def run(self):
-        if self.cond[1]:
-            self.clone_before()
-
-    def after(self):
-        self.destroy()
-
-
-Component.define_ns("if", If)
+        self.cond = self.cond[1]
+        if self.cond:
+            self.move_before()
+        self.destroy(children=self.cond)

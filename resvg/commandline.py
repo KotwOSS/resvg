@@ -109,7 +109,7 @@ def parse():
     Settings.trust_stmt = args.trust_stmt or args.trust
     Settings.pretty = args.pretty
     Settings.ext = args.ext.split(",")
-    Settings.comments = args.pretty or args.comments
+    Settings.comments = args.comments
     Settings.hide_logo = args.silent or args.hide_logo
     Settings.level = logging.ERROR if args.silent else args.level
     Settings.log = args.log

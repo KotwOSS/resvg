@@ -59,7 +59,7 @@ class Transform:
         self.active = el
         for transformer in self.transformers:
             if transformer(el):
-                break
+                return
 
     def set_var(self, name: str, value: Any):
         """Set a variable"""
@@ -73,6 +73,14 @@ class Transform:
         else:
             logging.debug("queue: transform §o%s§R", job.tag)
         self.queue.append(job)
+        
+    def insert_job(self, job: Callable, index: int):
+        """Insert a job into the queue"""
+        if isinstance(job, Callable):
+            logging.debug("queue: run §o%s§R at index §o%s§R", job.__name__, index)
+        else:
+            logging.debug("queue: transform §o%s§R at index §o%s§R", job.tag, index)
+        self.queue.insert(index, job)
 
     def transform(self):
         """Transform the tree"""

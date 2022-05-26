@@ -1,11 +1,24 @@
 <svg 
     xmlns="http://www.w3.org/2000/svg" 
-    xmlns:re="http://oss.kotw.dev/resvg" 
+    xmlns:re="http://oss.kotw.dev/resvg"
+    xmlns:graph="graph"
     width="100" height="100"
 >
-    <re:repeat x="20">
+
+
+    <!-- <re:repeat x="20">
         <re:if cond="x == 9">
             <h1 re:abc="x">kek</h1>
         </re:if>
-    </re:repeat>
+    </re:repeat> -->
+
+    <re:lib ns="graph">
+        <re:comp name="line">
+            <h1>kek</h1>
+        </re:comp>
+    </re:lib>
+
+    <graph:line />
+    <graph:line />
+    <graph:line />
 </svg>

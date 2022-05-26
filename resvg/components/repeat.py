@@ -40,6 +40,8 @@ class Repeat(Component):
 
         self.num = self.start
         self.direction = self.step > 0
+        
+        self.remove_child_jobs()
 
         return self.should_run()
 
