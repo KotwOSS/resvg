@@ -4,14 +4,8 @@
     width="100" height="100"
 >
     <re:repeat x="20">
-        <re:repeat y="20">
-            <rect
-                re:x="x*5" 
-                re:y="y*5" 
-                width="6"
-                height="6"
-                fill="rgba({(x+y)/40*255}, {(y-x)/40*255}, {(x-y)/40*255})"
-            />
-        </re:repeat>
+        <re:if cond="x == 9">
+            <h1 re:abc="x">kek</h1>
+        </re:if>
     </re:repeat>
 </svg>

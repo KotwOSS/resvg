@@ -8,10 +8,7 @@ from evaluator import Evaluator
 import logging, transform
 from settings import Settings
 
-
 T = TypeVar("T")
-
-
 class ExpressionEvaluator(Evaluator[T]):
     def __init__(self, expected: Type[T]):
         self.expected = expected

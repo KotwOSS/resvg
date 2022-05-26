@@ -107,7 +107,7 @@ class Component(ABC):
 
     def destroy(self):
         """Destroy the component node"""
-        for c in self.el.iter():
-            if c in self.transformer.queue:
-                self.transformer.queue.remove(c)
+        for child in self.el.iter():
+            if child in self.transformer.queue:
+                self.transformer.queue.remove(child)
         return self.el.getparent().remove(self.el)
