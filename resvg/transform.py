@@ -8,6 +8,7 @@ from array import array
 from typing import Any, Callable, Dict
 from lxml import etree
 from expression import SafeExpression
+from domlib import ProxiedDomSettings
 from settings import Settings
 import re, reutil, logging
 
@@ -18,12 +19,15 @@ class Transformer:
     root: etree._Element
     vars: Dict[str, Any]
     queue: array[etree._Element | Callable]
+    active: etree._Element
 
     def __init__(self, root: etree._Element):
         self.root = root
         self.queue = list(root.iter())
         self.queue.reverse()
         self.vars = {}
+        
+        ProxiedDomSettings.transformer = self
 
     def has_next(self):
         """Check if there are more elements to parse"""
@@ -39,6 +43,7 @@ class Transformer:
 
     def parse_element(self, el: etree._Element):
         """Parse an element from the queue"""
+        self.active = el
         for attr in el.attrib.items():
             attrname = attr[0]
             attrval = attr[1]

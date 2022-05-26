@@ -1,6 +1,6 @@
 # Regex utility functions
 from re import Pattern
-from typing import Any
+from typing import Any, Dict
 
 
 def multi_replace(value: str, regex: Pattern[Any], valuator):
@@ -29,3 +29,8 @@ def stringify(val: Any):
             return str(val)
     else:
         return str(val)
+
+def concat_dict(dict1: Dict[Any, Any], dict2: Dict[Any, Any]) -> Dict[Any, Any]:
+    """Concatenate two dictionaries"""
+    dict1.update(dict2)
+    return dict1

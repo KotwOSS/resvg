@@ -45,7 +45,8 @@ def compile():
             logging.info(
                 "Finished Compiling! Took §o%s§R ms", f"{millis:10.3f}".strip()
             )
-            if not Settings.silent:
-                print()
     except Exception as e:
         logging.exception("Error occured while compiling: %s", e)
+
+    if not Settings.silent:
+            print()

@@ -1,16 +1,16 @@
 <svg 
     xmlns="http://www.w3.org/2000/svg" 
     xmlns:re="http://oss.kotw.dev/resvg" 
-    width="110" height="110"
+    width="100" height="100"
 >
-    <re:repeat x="xrange(0, 1.0, 0.1)">
-        <re:repeat y="10">
+    <re:repeat x="20">
+        <re:repeat y="20">
             <rect
-                re:x="x*10" 
-                re:y="y*10" 
-                width="10"
-                height="10"
-                fill="rgba({(x+y)/20*255}, 0, 0)"
+                re:x="x*5" 
+                re:y="y*5" 
+                width="6"
+                height="6"
+                fill="rgba({(x+y)/40*255}, {(y-x)/40*255}, {(x-y)/40*255})"
             />
         </re:repeat>
     </re:repeat>

@@ -5,9 +5,10 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from copy import deepcopy
-from typing import Callable, Dict, List, Type, cast
+from typing import Callable, Dict, List, Type
 from lxml import etree
 from evaluator import Evaluator
+from settings import Settings
 import transform
 
 
@@ -28,6 +29,10 @@ class Component(ABC):
     def define(name: str, comp: Type[Component]):
         """Define a component"""
         Component.components[name] = comp
+    
+    def define_ns(name: str, comp: Type[Component]):
+        """Define a component in the default resvg namespace"""
+        Component.define(Settings.resvg_namespace + name, comp)
 
     def parse(self):
         """Parse the component"""
@@ -38,36 +43,38 @@ class Component(ABC):
                     break
 
         (self._before if self.use_before else self._run)()
-            
-    @abstractmethod
+
     def before(self) -> bool | transform.TransformJob | None:
         """The before function will be run before the run method"""
         pass
-    
+
     def _before(self):
         """Before job handler"""
         val = self.before()
-        if val: self.append_job(val if isinstance(val, Callable) else self._run)
-        elif self.use_after: self.append_job(self._after)
+        if val:
+            self.append_job(val if isinstance(val, Callable) else self._run)
+        elif self.use_after:
+            self.append_job(self._after)
         self._complete_jobs()
-    
+
     @abstractmethod
     def run(self) -> bool | transform.TransformJob | None:
         """The run method will be ran as long as it returns True"""
         pass
-    
+
     def _run(self):
         """Run job handler"""
         val = self.run()
-        if val: self.append_job(val if isinstance(val, Callable) else self._run)
-        elif self.use_after: self.append_job(self._after)
+        if val:
+            self.append_job(val if isinstance(val, Callable) else self._run)
+        elif self.use_after:
+            self.append_job(self._after)
         self._complete_jobs()
-    
-    @abstractmethod
+
     def after(self) -> bool | transform.TransformJob | None:
         """The before function will be run after the run method"""
         pass
-    
+
     def _after(self):
         """After job handler"""
         self.after()
@@ -79,16 +86,18 @@ class Component(ABC):
         for job in self.jobs:
             self.transformer.add_job(job)
         self.jobs = []
-        
+
     def append_job(self, job: Callable | etree._Element, complete: bool = False):
         """Appends a job"""
         self.jobs.append(job)
-        if complete: self._complete_jobs()
+        if complete:
+            self._complete_jobs()
 
     def clone(self, el: etree._Element, add_job: bool = True):
         """Clones an element"""
         clone = deepcopy(el)
-        if add_job: self.append_job(clone)
+        if add_job:
+            self.append_job(clone)
         return clone
 
     def clone_before(self, add_job: bool = True):
