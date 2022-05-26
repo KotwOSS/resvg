@@ -2,8 +2,11 @@
 #
 # Copyright (c) 2022 KotwOSS
 
-import argparse, colors, logger, compiler, watcher, logging, components  # This import is not unused. It loads the builtin components
+import argparse, colors, logger, compiler, watcher, logging, components, transformers
 from settings import Settings
+
+components.register()
+transformers.register()
 
 
 def silent_print_logo():

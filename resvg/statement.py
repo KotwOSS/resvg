@@ -28,6 +28,8 @@ class SafeStatement:
                 )
         except Exception as e:
             logging.critical(
-                "Error while executing statement '''\n§o%s§R\n''': %s", self.statement, e
+                "Error while executing statement '''\n§o%s§R\n''': %s",
+                self.statement,
+                e,
             )
             raise e

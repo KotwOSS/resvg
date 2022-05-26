@@ -12,5 +12,5 @@ T = TypeVar("T")
 
 class Evaluator(ABC, Generic[T]):
     @abstractmethod
-    def parse(self, transformer: transform.Transformer, txt: str) -> T:
+    def parse(self, transformer: transform.Transform, txt: str) -> T:
         pass

@@ -30,6 +30,7 @@ def stringify(val: Any):
     else:
         return str(val)
 
+
 def concat_dict(dict1: Dict[Any, Any], dict2: Dict[Any, Any]) -> Dict[Any, Any]:
     """Concatenate two dictionaries"""
     dict1.update(dict2)

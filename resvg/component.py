@@ -3,13 +3,13 @@
 # Copyright (c) 2022 KotwOSS
 
 from __future__ import annotations
+from transform import Transform
 from abc import ABC, abstractmethod
 from copy import deepcopy
 from typing import Callable, Dict, List, Type
 from lxml import etree
 from evaluator import Evaluator
 from settings import Settings
-import transform
 
 
 class Component(ABC):
@@ -17,11 +17,11 @@ class Component(ABC):
     arguments: Dict[str, (Callable[[str, str], bool], Evaluator)]
     use_before: bool = False
     use_after: bool = False
-    transformer: "transform.Transformer"
+    transformer: Transform
     el: etree._Element
-    jobs: List[transform.TransformJob | etree._Element]
+    jobs: List[Callable | etree._Element]
 
-    def __init__(self, transformer: transform.Transformer, el: etree._Element):
+    def __init__(self, transformer: Transform, el: etree._Element):
         self.transformer = transformer
         self.el = el
         self.jobs = []
@@ -29,7 +29,7 @@ class Component(ABC):
     def define(name: str, comp: Type[Component]):
         """Define a component"""
         Component.components[name] = comp
-    
+
     def define_ns(name: str, comp: Type[Component]):
         """Define a component in the default resvg namespace"""
         Component.define(Settings.resvg_namespace + name, comp)
@@ -44,7 +44,7 @@ class Component(ABC):
 
         (self._before if self.use_before else self._run)()
 
-    def before(self) -> bool | transform.TransformJob | None:
+    def before(self) -> bool | Callable | None:
         """The before function will be run before the run method"""
         pass
 
@@ -58,7 +58,7 @@ class Component(ABC):
         self._complete_jobs()
 
     @abstractmethod
-    def run(self) -> bool | transform.TransformJob | None:
+    def run(self) -> bool | Callable | None:
         """The run method will be ran as long as it returns True"""
         pass
 
@@ -71,7 +71,7 @@ class Component(ABC):
             self.append_job(self._after)
         self._complete_jobs()
 
-    def after(self) -> bool | transform.TransformJob | None:
+    def after(self) -> bool | Callable | None:
         """The before function will be run after the run method"""
         pass
 

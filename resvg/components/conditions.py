@@ -3,12 +3,13 @@
 # Copyright (c) 2022 KotwOSS
 
 from component import Component
-from expression import ExpressionEvaluator
+from expression import Expression
+
 
 class If(Component):
     use_after = True
     arguments = {
-        "cond": (lambda an, av: an == "cond", ExpressionEvaluator(bool)),
+        "cond": (lambda an, av: an == "cond", Expression(bool)),
     }
 
     def run(self):

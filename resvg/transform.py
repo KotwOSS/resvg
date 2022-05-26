@@ -3,22 +3,25 @@
 # Copyright (c) 2022 KotwOSS
 
 from __future__ import annotations
-from component import Component
-from array import array
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, List, Type
 from lxml import etree
-from expression import SafeExpression
 from domlib import ProxiedDomSettings
-from settings import Settings
-import re, reutil, logging
+from transformer import Transformer
+import logging
 
 
-class Transformer:
-    expression_regex = re.compile(r"{([a-zA-Z0-9.*/+-^()\"' ]+)}")
+class Transform:
+    default_transformers: List[Type[Transformer]] = []
 
+    @staticmethod
+    def register_default_transformer(transformer: Transformer):
+        """Register a default transformer"""
+        Transform.default_transformers.append(transformer)
+
+    transformers: List[Transformer]
     root: etree._Element
     vars: Dict[str, Any]
-    queue: array[etree._Element | Callable]
+    queue: List[etree._Element | Callable]
     active: etree._Element
 
     def __init__(self, root: etree._Element):
@@ -26,8 +29,18 @@ class Transformer:
         self.queue = list(root.iter())
         self.queue.reverse()
         self.vars = {}
-        
+        self.transformers = []
+
         ProxiedDomSettings.transformer = self
+
+    def register_default_transformers(self):
+        """Register the default transformers"""
+        for transformer in Transform.default_transformers:
+            self.register_transformer(transformer(self))
+
+    def register_transformer(self, transformer: Transformer):
+        """Register an element transformer"""
+        self.transformers.append(transformer)
 
     def has_next(self):
         """Check if there are more elements to parse"""
@@ -44,30 +57,9 @@ class Transformer:
     def parse_element(self, el: etree._Element):
         """Parse an element from the queue"""
         self.active = el
-        for attr in el.attrib.items():
-            attrname = attr[0]
-            attrval = attr[1]
-
-            attrval = reutil.multi_replace(
-                attrval,
-                self.expression_regex,
-                lambda exp: reutil.stringify(
-                    SafeExpression(exp.group(1), self.vars, Any).eval()
-                ),
-            )
-
-            if attrname.startswith(Settings.resvg_namespace):
-                name = attrname[len(Settings.resvg_namespace) :]
-                el.attrib[name] = reutil.stringify(
-                    SafeExpression(attrval, self.vars, Any).eval()
-                )
-                del el.attrib[attrname]
-            else:
-                el.attrib[attrname] = attrval
-
-        if el.tag in Component.components:
-            comp = Component.components[el.tag](self, el)
-            comp.parse()
+        for transformer in self.transformers:
+            if transformer(el):
+                break
 
     def set_var(self, name: str, value: Any):
         """Set a variable"""

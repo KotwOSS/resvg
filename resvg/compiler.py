@@ -5,7 +5,7 @@
 import os, logging, time
 from settings import Settings
 from lxml import etree
-from transform import Transformer
+from transform import Transform
 
 
 def compile():
@@ -25,8 +25,11 @@ def compile():
                 parser.feed(file.read())
                 root = parser.close()
 
-                transformer = Transformer(root)
-                transformer.transform()
+                transform = Transform(root)
+                transform.register_default_transformers()
+                transform.transform()
+
+                etree.cleanup_namespaces(root)
 
                 result = etree.tostring(root, pretty_print=Settings.pretty)
 
@@ -49,4 +52,4 @@ def compile():
         logging.exception("Error occured while compiling: %s", e)
 
     if not Settings.silent:
-            print()
+        print()

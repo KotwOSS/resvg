@@ -7,13 +7,17 @@ import math, random, numpy, reutil, domlib
 from typing import Any, Callable
 from xrange import xrange
 
+
 class NotAllowed(Callable):
     def __init__(self, name: str):
         self.name = name
-        
+
     def __call__(self, *args):
-        raise RuntimeError(f"The function '§o{self.name}§R' was disabled for security reasons!")
-        
+        raise RuntimeError(
+            f"The function '§o{self.name}§R' was disabled for security reasons!"
+        )
+
+
 class Settings:
     # Generic information
     version = "0.0.0alpha3"
@@ -38,7 +42,7 @@ class Settings:
     ext = []
     log: str
     level: int
-    
+
     transformer: Any
 
     globals = {
@@ -69,11 +73,7 @@ class Settings:
         "print": print,
         "logging": logging,
     }
-    
-    exp_globals = reutil.concat_dict(globals.copy(), {
-        
-    })
-    
-    stmt_globals = reutil.concat_dict(globals.copy(), {
-        "dom": domlib.ProxiedDom
-    })
+
+    exp_globals = reutil.concat_dict(globals.copy(), {})
+
+    stmt_globals = reutil.concat_dict(globals.copy(), {"dom": domlib.ProxiedDom})

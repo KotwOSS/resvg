@@ -4,7 +4,7 @@
 
 from typing import Tuple
 from component import Component
-from expression import ExpressionEvaluator
+from expression import Expression
 from settings import Settings
 from xrange import xrange
 
@@ -13,7 +13,7 @@ class Repeat(Component):
     use_before = True
     use_after = True
     arguments = {
-        "var": (lambda an, av: True, ExpressionEvaluator(int | range | xrange)),
+        "var": (lambda an, av: True, Expression(int | range | xrange)),
     }
 
     start: float
@@ -54,6 +54,3 @@ class Repeat(Component):
 
     def after(self):
         self.destroy()
-
-
-Component.define_ns("repeat", Repeat)

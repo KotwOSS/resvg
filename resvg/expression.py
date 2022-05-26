@@ -9,11 +9,13 @@ import logging, transform
 from settings import Settings
 
 T = TypeVar("T")
-class ExpressionEvaluator(Evaluator[T]):
+
+
+class Expression(Evaluator[T]):
     def __init__(self, expected: Type[T]):
         self.expected = expected
 
-    def parse(self, transformer: transform.Transformer, txt: str) -> T:
+    def parse(self, transformer: transform.Transform, txt: str) -> T:
         return SafeExpression(txt, transformer.vars, self.expected).eval()
 
 

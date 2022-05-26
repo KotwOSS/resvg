@@ -3,14 +3,17 @@
 # Copyright (c) 2022 KotwOSS
 
 from component import Component
-from statement import SafeStatement
+from raw import Raw
 
 
-class Run(Component):
+class Lib(Component):
     use_after = True
+    arguments = {
+        "ns": (lambda an, av: an == "ns", Raw(str)),
+    }
 
     def run(self):
-        SafeStatement(self.el.text, self.transformer.vars).exec()
+        self.ns = self.ns[1]
 
     def after(self):
         self.destroy()
