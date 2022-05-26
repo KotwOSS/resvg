@@ -15,7 +15,7 @@
 import os, sys, colors
 
 # The required modules
-required_modules = ["lxml", "watchdog", "argparse"]
+required_modules = ["lxml", "watchdog", "argparse", "numpy"]
 
 for required in required_modules:
     try:

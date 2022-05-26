@@ -3,7 +3,7 @@
     xmlns:re="http://oss.kotw.dev/resvg" 
     width="110" height="110"
 >
-    <re:repeat x="10">
+    <re:repeat x="xrange(0, 1.0, 0.1)">
         <re:repeat y="10">
             <rect
                 re:x="x*10" 

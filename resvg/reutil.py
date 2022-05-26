@@ -22,9 +22,10 @@ def stringify(val: Any):
     elif isinstance(val, int):
         return str(val)
     elif isinstance(val, float):
+        val = float(f"{val:10.3f}")
         if val.is_integer():
             return str(int(val))
         else:
-            return str(float(f"{val:10.3f}"))
+            return str(val)
     else:
         return str(val)

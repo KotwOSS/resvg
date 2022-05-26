@@ -21,7 +21,7 @@ class Transformer:
 
     def __init__(self, root: etree._Element):
         self.root = root
-        self.queue = list(root.getiterator())
+        self.queue = list(root.iter())
         self.queue.reverse()
         self.vars = {}
 
