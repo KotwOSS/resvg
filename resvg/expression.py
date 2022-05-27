@@ -8,6 +8,7 @@ from evaluator import Evaluator
 from settings import Settings
 import logging, transform, re
 
+
 class MultiExpression(Evaluator[Any]):
     def __init__(self, *expected: List[Type[Any]]):
         self.expected = expected
@@ -18,8 +19,11 @@ class MultiExpression(Evaluator[Any]):
             for i, p in enumerate(parts):
                 parts[i] = SafeExpression(p, transformer.vars, self.expected[i]).eval()
         return parts
-    
+
+
 T = TypeVar("T")
+
+
 class Expression(Evaluator[T]):
     def __init__(self, expected: Type[T]):
         self.expected = expected
@@ -28,7 +32,7 @@ class Expression(Evaluator[T]):
         return SafeExpression(txt, transformer.vars, self.expected).eval()
 
 
-class SafeExpression:    
+class SafeExpression:
     def __init__(self, expression: str, locals: Dict[str, Any], expected: Type[T]):
         self.expression = Settings.proccess_operation(expression)
         self.locals = locals

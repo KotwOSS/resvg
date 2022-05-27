@@ -7,6 +7,7 @@ from settings import Settings
 from lxml import etree
 from transform import Transform
 
+
 def compile():
     try:
         if Settings.input != None and os.path.isfile(Settings.input):

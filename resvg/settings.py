@@ -27,7 +27,6 @@ class Settings:
     resvg_namespace: str = "{http://oss.kotw.dev/resvg}"
     exp_namespace: str = "{http://oss.kotw.dev/resvg/expression}"
     svg_namespace: str = "{http://www.w3.org/2000/svg}"
-    
 
     lib_dir: str
     no_color: bool
@@ -47,7 +46,7 @@ class Settings:
     level: int
 
     transformer: Any
-    
+
     smaller_regex = re.compile("\s*smaller\s*")
     greater_regex = re.compile("\s*greater\s*")
     smequal_regex = re.compile("\s*smequal\s*")

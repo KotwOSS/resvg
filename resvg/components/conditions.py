@@ -18,5 +18,5 @@ class If(Component):
         cond = self.cond[1]
         if cond:
             self.move_before()
-        
+
         self.destroy(children=not cond)

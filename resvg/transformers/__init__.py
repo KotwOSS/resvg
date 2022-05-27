@@ -7,6 +7,7 @@ from .attribute import *
 from .components import *
 from .custom import *
 
+
 def register():
     """Register the default transformers"""
     Transform.register_default_transformer(AttributeTransformer)

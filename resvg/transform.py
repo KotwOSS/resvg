@@ -10,30 +10,32 @@ from transformer import Transformer
 import logging
 
 T = TypeVar("T")
+
+
 class Data:
     """Datacontainer which is able to store and modify data"""
-    
+
     defaults: Dict[str, Any] = {}
 
     def default(key: str, value: Any):
         """Set default data"""
         Data.defaults[key] = value
-    
+
     def __init__(self) -> None:
         self._data = Data.defaults.copy()
-    
+
     def set(self, key: str, value: Any):
         """Set the value of key"""
         self._data[key] = value
-    
+
     def has(self, key: str) -> bool:
         """Return if key in data"""
         return key in self._data
-    
+
     def get(self, key: str, default: T = None) -> T:
         """Get the value of key"""
         return self._data[key] if key in self._data else default
-        
+
     def get_or_set(self, key: str, value: T) -> T:
         """Get or set the value of key"""
         if key in self._data:
@@ -41,11 +43,12 @@ class Data:
         else:
             self._data[key] = value
             return value
-    
+
     def remove(self, key: str) -> bool:
         """Remove the key from data"""
         del self._data[key]
-        
+
+
 class Transform:
     default_transformers: List[Type[Transformer]] = []
 
@@ -113,7 +116,7 @@ class Transform:
         else:
             logging.debug("queue: transform §o%s§R", job.tag)
         self.queue.append(job)
-        
+
     def insert_job(self, job: Callable, index: int):
         """Insert a job into the queue"""
         if isinstance(job, Callable):

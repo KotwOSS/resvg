@@ -12,6 +12,7 @@ from .fragment import *
 from .include import *
 from .path import *
 
+
 def register():
     """Register the components"""
     Component.define_ns("repeat", Repeat)

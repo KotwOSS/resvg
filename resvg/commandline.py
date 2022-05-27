@@ -9,6 +9,7 @@ components.register()
 transformers.register()
 default_data.register()
 
+
 def silent_print_logo():
     """Print the logo if not in silent mode."""
 
@@ -86,7 +87,11 @@ def parse():
         "trust": ["enable trust for statements and expressions", "store_true"],
         "hide-logo": ["hide logo", "store_true"],
         "comments": ["keep the comments from the ReSVG file", "store_true"],
-        "lib-dir": ["specify the directory where the relibs will be saved to", str, ".relib"],
+        "lib-dir": [
+            "specify the directory where the relibs will be saved to",
+            str,
+            ".relib",
+        ],
     }
 
     for arg, info in args.items():

@@ -8,6 +8,7 @@ from raw import Raw
 from components.lib import Library
 import logging
 
+
 class Comp(Component):
     arguments = {
         "name": (lambda an, av: an == "name", Raw(str), True),

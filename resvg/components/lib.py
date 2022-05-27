@@ -9,13 +9,15 @@ import logging
 from raw import Raw
 from lxml import etree
 
+
 class Library:
     components: Dict[str, List[etree._Element]]
     ns: str
-    
+
     def __init__(self, ns):
         self.components = {}
         self.ns = ns
+
 
 class Lib(Component):
     use_last = True
@@ -27,16 +29,16 @@ class Lib(Component):
     def run(self):
         if not self.data.has("library"):
             ns = self.ns[1]
-            
+
             logging.debug("start library §o%s§R", ns)
-            
+
             if ns in self.libraries:
                 library = self.libraries[ns]
             else:
                 logging.info("Registered library §o%s§R", ns)
                 library = Library(ns)
                 self.libraries[ns] = library
-            
+
             self.data.set("library", library)
         else:
             raise RuntimeError("Library component can not be in another library")

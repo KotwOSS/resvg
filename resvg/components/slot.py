@@ -7,6 +7,7 @@ from component import Component
 from expression import Expression
 from lxml import etree
 
+
 class Slot(Component):
     use_data = ["slots"]
 
@@ -15,7 +16,7 @@ class Slot(Component):
         if slot_l > 0:
             slot: List[etree._Element] = self.slots[slot_l - 1]
             slot_cl = len(slot)
-            
+
             if slot_cl > 0:
                 cloned = [self.clone(el, add_jobs=True) for el in slot]
                 self.insert_before(cloned)

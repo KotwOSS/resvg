@@ -7,11 +7,12 @@ from component import Component
 
 from .operations import *
 
+
 class Close(Component):
     use_data = ["path"]
-    
+
     path: List[PathOperation]
-    
+
     def run(self):
         self.path.append(CloseOperation())
         self.destroy()
