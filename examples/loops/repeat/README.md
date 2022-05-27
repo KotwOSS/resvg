@@ -16,7 +16,7 @@
 
 **Name** <br>
 
-The name of the counter variable which will be used (Use _ to specify not using a variable).
+The name of the counter variable which will be used (Use \_ to specify not using a variable).
 
 **Value** <br>
 

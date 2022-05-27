@@ -19,7 +19,7 @@ class NotAllowed(Callable):
 
 class Settings:
     # Generic information
-    version = "0.0.0alpha3"
+    version = "0.0.0beta0"
     authors = ["KotwOSS"]
     license = "MIT"
     year = 2022

@@ -22,12 +22,12 @@
 
 **Name** <br>
 
-The name of the counter variable which will be used (Use _ to specify not using a variable).
+The name of the counter variable which will be used (Use \_ to specify not using a variable).
 
 **Value** <br>
 
-***Range*** <br>
+**_Range_** <br>
 An expression that returns a python range object. <br>
 
-***C like for expression*** <br>
+**_C like for expression_** <br>
 `<start>;<cond>;<after>`<br

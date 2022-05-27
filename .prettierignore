@@ -1,0 +1,4 @@
+resvg/
+*.py
+__pycache__
+*.rsvg

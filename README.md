@@ -121,16 +121,19 @@ resvg --hide-logo
 ```
 
 Specify the newline character:
+
 ```sh
 resvg --newl "\n"
 ```
 
 Specify the indent space count:
+
 ```sh
 resvg --indent 4
 ```
 
 Keep the comments:
+
 ```sh
 resvg --comments
 ```
