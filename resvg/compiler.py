@@ -3,7 +3,6 @@
 # Copyright (c) 2022 KotwOSS
 
 import os, logging, time
-from components.library import Library
 from settings import Settings
 from lxml import etree
 from transform import Transform
@@ -25,7 +24,6 @@ def compile():
                 parser.feed(file.read())
                 root = parser.close()
 
-                Library.reset()
                 transform = Transform(root)
                 transform.register_default_transformers()
                 transform.transform()

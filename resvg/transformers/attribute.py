@@ -24,14 +24,14 @@ class AttributeTransformer(Transformer):
                 attrval,
                 self.expression_regex,
                 lambda exp: reutil.stringify(
-                    SafeExpression(exp.group(1), self.transformer.vars, Any).eval()
+                    SafeExpression(exp.group(1), self.transform.vars, Any).eval()
                 ),
             )
 
             if attrname.startswith(Settings.resvg_namespace):
                 name = attrname[len(Settings.resvg_namespace) :]
                 el.attrib[name] = reutil.stringify(
-                    SafeExpression(attrval, self.transformer.vars, Any).eval()
+                    SafeExpression(attrval, self.transform.vars, Any).eval()
                 )
                 del el.attrib[attrname]
             else:

@@ -9,31 +9,28 @@ from raw import Raw
 from lxml import etree
 
 class Library:
-    libraries: Dict[str, Library] = {}
-    library: Library | None = None
-    
-    def reset():
-        Library.libraries = {}
-        Library.library = None
-        
     components: Dict[str, List[etree._Element]]
     def __init__(self):
         self.components = {}
 
 class Lib(Component):
     use_last = True
+    use_data = ["libraries"]
     arguments = {
         "ns": (lambda an, av: an == "ns", Raw(str)),
     }
 
     def run(self):
-        if not Library.library:
-            lib = self.ns[1]
-            Library.library = Library()
-            Library.libraries[lib] = Library.library
+        if not self.data.has("library"):
+            library = Library()
+            
+            ns = self.ns[1]
+            self.libraries[ns] = library
+            
+            self.data.set("library", library)
         else:
             raise RuntimeError("Library component can not be in another library")
 
     def last(self):
-        Library.library = None
+        self.data.remove("library")
         self.destroy(children=False)

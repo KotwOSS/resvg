@@ -4,11 +4,11 @@
 
 from transform import Transform
 from .attribute import *
-from .component import *
-from .library import *
+from .components import *
+from .custom import *
 
 def register():
     """Register the default transformers"""
     Transform.register_default_transformer(AttributeTransformer)
     Transform.register_default_transformer(ComponentTransformer)
-    Transform.register_default_transformer(LibraryTransformer)
+    Transform.register_default_transformer(CustomTransformer)

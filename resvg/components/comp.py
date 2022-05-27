@@ -3,10 +3,9 @@
 # Copyright (c) 2022 KotwOSS
 
 from __future__ import annotations
-from typing import Dict
 from component import Component
 from raw import Raw
-from components.library import Library
+from components.lib import Library
 
 class Comp(Component):
     arguments = {
@@ -14,8 +13,8 @@ class Comp(Component):
     }
 
     def run(self):
-        if Library.library:
-            Library.library.components[self.name[1]] = self.clone_children(add_jobs=False)
+        if self.data.has("library"):
+            self.data.get("library", Library).components[self.name[1]] = self.clone_children(add_jobs=False)
         else:
             raise RuntimeError("Comp components can only be in a library")
 

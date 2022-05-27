@@ -5,7 +5,6 @@
 from typing import Tuple
 from component import Component
 from expression import Expression
-from settings import Settings
 from xrange import xrange
 
 
@@ -48,7 +47,7 @@ class Repeat(Component):
     def run(self):
         self.clone_before()
 
-        self.transformer.set_var(self.var, self.num)
+        self.transform.set_var(self.var, self.num)
 
         self.num += self.step
 

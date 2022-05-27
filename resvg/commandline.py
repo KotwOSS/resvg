@@ -2,12 +2,12 @@
 #
 # Copyright (c) 2022 KotwOSS
 
-import argparse, colors, logger, compiler, watcher, logging, components, transformers
+import argparse, colors, logger, compiler, watcher, logging, components, transformers, default_data
 from settings import Settings
 
 components.register()
 transformers.register()
-
+default_data.register()
 
 def silent_print_logo():
     """Print the logo if not in silent mode."""

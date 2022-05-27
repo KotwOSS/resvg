@@ -9,10 +9,12 @@ import transform
 
 
 class Transformer(ABC):
-    transformer: "transform.Transform"
+    transform: "transform.Transform"
+    data: "transform.Datacontainer"
 
-    def __init__(self, transformer: transform.Transform):
-        self.transformer = transformer
+    def __init__(self, transform: transform.Transform):
+        self.transform = transform
+        self.data = transform.data
 
     @abstractmethod
     def __call__(self, el: etree._Element) -> bool:

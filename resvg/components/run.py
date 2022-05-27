@@ -8,5 +8,5 @@ from statement import SafeStatement
 
 class Run(Component):
     def run(self):
-        SafeStatement(self.el.text, self.transformer.vars).exec()
+        SafeStatement(self.el.text, self.transform.vars).exec()
         self.destroy()

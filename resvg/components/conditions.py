@@ -4,7 +4,6 @@
 
 from component import Component
 from expression import Expression
-from lxml import etree
 
 
 class If(Component):
@@ -13,7 +12,7 @@ class If(Component):
     }
 
     def run(self):
-        self.cond = self.cond[1]
-        if self.cond:
+        cond = self.cond[1]
+        if cond:
             self.move_before()
-        self.destroy(children=self.cond)
+        self.destroy(children=not cond)
