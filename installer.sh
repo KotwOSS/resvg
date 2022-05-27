@@ -21,7 +21,7 @@
 #           deinstallation of ReSVG.               #
 
 
-version='0.0.0alpha0'
+version='0.0.0alpha1'
 
 
 red='\033[38;2;255;100;100m'
@@ -52,7 +52,7 @@ function install() {
     chmod +x resvg
 
     echo '# RESVG INSTALL' >> "/home/$user/.bashrc"
-    echo 'export PATH=''$install_path':$PATH'' >> "/home/$user/.bashrc"
+    echo 'export PATH="'$install_path':$PATH"' >> "/home/$user/.bashrc"
     echo '# END RESVG INSTALL' >> "/home/$user/.bashrc"
 
     printf '\n'
@@ -61,8 +61,12 @@ function install() {
 
 function uninstall() {
     printf 'Uninstalling...\n'
+    
+    if [ -f 'resvg' ]; then
+        rm resvg
+    fi
     sed -i '/RESVG INSTALL/,/# END RESVG INSTALL/d' "/home/$user/.bashrc"
-    rm resvg
+
     printf '\n'
     printf 'Successfully '$red'uninstalled '$reset'resvg!\n'
 }

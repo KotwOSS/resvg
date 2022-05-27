@@ -1,7 +1,13 @@
 ```
-░█▀▀█ █▀▀ ░█▀▀▀█ ░█  ░█ ░█▀▀█
-░█▄▄▀ █▀▀  ▀▀▀▄▄  ░█░█  ░█ ▄▄
-░█ ░█ ▀▀▀ ░█▄▄▄█   ▀▄▀  ░█▄▄█
+$$$$$$$\             $$$$$$\  $$\    $$\  $$$$$$\  
+$$  __$$\           $$  __$$\ $$ |   $$ |$$  __$$\ 
+$$ |  $$ | $$$$$$\  $$ /  \__|$$ |   $$ |$$ /  \__|
+$$$$$$$  |$$  __$$\ \$$$$$$\  \$$\  $$  |$$ |$$$$\ 
+$$  __$$< $$$$$$$$ | \____$$\  \$$\$$  / $$ |\_$$ |
+$$ |  $$ |$$   ____|$$\   $$ |  \$$$  /  $$ |  $$ |
+$$ |  $$ |\$$$$$$$\ \$$$$$$  |   \$  /   \$$$$$$  |
+\__|  \__| \_______| \______/     \_/     \______/ 
+                                                   
 Advance your SVG experience
 ```
 
@@ -14,6 +20,7 @@ Advance your SVG experience
 
 ReSVG is a advanced SVG compiler, which includes many features, and is written in [python](https://www.python.org/).
 
+<hr>
 <br>
 
 ## License
@@ -23,134 +30,53 @@ This project is licensed under the [Mit License](https://mit-license.org/)
 <hr>
 <br>
 
-## Features
+# Quick Start
 
-1. [Loops](examples/repeat/doc.md)
-2. [Conditions](examples/if/doc.md)
-3. [Variables](examples/define/doc.md)
-
-<hr>
-<br>
-
-## Installation
-
-Linux:
-
-```bash
-git clone https://github.com/KotwOSS/resvg.git
-cd resvg
-chmod +x resvg.py
-sudo ln resvg.py /usr/bin/resvg
-```
+<h2><a href="https://oss.kotw.dev/resvg/INSTALL">Install</a></h2>
+<h2><a href="https://oss.kotw.dev/resvg/UNINSTALL">Uninstall</a></h2>
+<h2><a href="https://oss.kotw.dev/resvg/USAGE">Usage</a></h2>
 
 <hr>
 <br>
 
-## Usage
+## Components
 
-Show the help:
-
-```sh
-resvg --help
-```
-
-Show the version:
-
-```sh
-resvg --version
-```
-
-Compile a ReSVG file to a SVG file:
-
-```sh
-resvg --compile -i input.rsvg -o output.svg
-```
-
-Compile a ReSVG file and print it inside of the terminal:
-
-```sh
-resvg --compile -i input.rsvg
-```
-
-Silent mode:
-
-```sh
-resvg --silent
-```
-
-Log to a file:
-
-```sh
-resvg --log myfile.log
-```
-
-Only display the errors:
-
-```sh
-resvg --compile --only-errors -i input.rsvg
-```
-
-Pretty print the xml:
-
-```sh
-resvg --compile --pretty -i input.rsvg
-```
-
-Trust statements:
-
-```sh
-resvg --trust-stmt
-```
-
-Trust expressions:
-
-```sh
-resvg --trust-exp
-```
-
-Trust expressions and statements:
-
-```sh
-resvg --trust
-```
-
-Hide the logo:
-
-```sh
-resvg --hide-logo
-```
-
-Specify the newline character:
-
-```sh
-resvg --newl "\n"
-```
-
-Specify the indent space count:
-
-```sh
-resvg --indent 4
-```
-
-Keep the comments:
-
-```sh
-resvg --comments
-```
-
-Specify the logging level:
-
-```sh
-resvg --level [-1-3]
-```
-
-**Log Levels**<br>
--1: Debug<br>
-0: Info<br>
-1: Warning<br>
-2: Error<br>
-3: Fatal<br>
-
+1. [Repeat](examples/repeat/doc.md)
+   ```xml
+   <re:repeat {var}="{exp(int | range | xrange)}" />
+   ```
+2. [While](examples/while/doc.md)
+    ```xml
+    <re:while cond="{exp(bool)}" />
+    ```
+3. [If](examples/if/doc.md)
+    ```xml
+    <re:if cond="{exp(bool)}" />
+    ```
+4. [Lib](examples/lib/doc.md)
+    ```xml
+    <re:lib ns="{raw(str)}" />
+    ```
+5. [Comp](examples/comp/doc.md)
+    ```xml
+    <re:comp name="{raw(str)}" />
+    ```
+6. [Path](examples/path/doc.md)
+    ```xml
+    <re:path re:transform="{exp(float)};{exp(float)}" *args />
+    ```
+7. [Include](examples/include/doc.md)
+    ```xml
+    <re:include kup="{raw(str)}" url="{raw(str)}" path="{raw(str)}" />
+    ```
+8. [Slot](examples/slot/doc.md)
+    ```xml
+    <re:slot/>
+    ```
+9.  [Run](examples/run/doc.md)
+    ```xml
+    <re:run/>
+    ```
 <hr>
 <br>
 

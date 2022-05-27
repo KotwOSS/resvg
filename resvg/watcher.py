@@ -61,9 +61,9 @@ def watch():
         observer.join()
     else:
         if Settings.input:
-            logging.exit_fatal("Input file not found.")
+            logging.critical("Input file not found.")
         else:
-            logging.exit_fatal("No input file specified")
+            logging.critical("No input file specified")
 
 
 class WatchHandler(FileSystemEventHandler):
