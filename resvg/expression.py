@@ -3,14 +3,23 @@
 # Copyright (c) 2022 KotwOSS
 
 from __future__ import annotations
-from typing import Any, Dict, Type, TypeVar
+from typing import Any, Dict, List, Type, TypeVar
 from evaluator import Evaluator
 from settings import Settings
 import logging, transform, re
 
+class MultiExpression(Evaluator[Any]):
+    def __init__(self, *expected: List[Type[Any]]):
+        self.expected = expected
+
+    def parse(self, transformer: transform.Transform, txt: str) -> Any:
+        parts = txt.split(";")
+        if len(parts) == len(self.expected):
+            for i, p in enumerate(parts):
+                parts[i] = SafeExpression(p, transformer.vars, self.expected[i]).eval()
+        return parts
+    
 T = TypeVar("T")
-
-
 class Expression(Evaluator[T]):
     def __init__(self, expected: Type[T]):
         self.expected = expected
@@ -32,6 +41,8 @@ class SafeExpression:
 
                 if self.expected == Any or isinstance(result, self.expected):
                     return result
+                elif self.expected == float and isinstance(result, int):
+                    return float(result)
                 else:
                     raise TypeError(
                         "Expression did not return type '%s'" % self.expected.__name__

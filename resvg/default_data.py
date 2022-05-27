@@ -8,3 +8,4 @@ def register():
     """Register the default data"""
     Data.default("libraries", {})
     Data.default("slots", [])
+    Data.default("paths", [])

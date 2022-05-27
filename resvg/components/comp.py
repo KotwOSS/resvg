@@ -10,7 +10,7 @@ import logging
 
 class Comp(Component):
     arguments = {
-        "name": (lambda an, av: an == "name", Raw(str)),
+        "name": (lambda an, av: an == "name", Raw(str), True),
     }
 
     def run(self):

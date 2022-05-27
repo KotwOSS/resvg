@@ -21,7 +21,7 @@ class Lib(Component):
     use_last = True
     use_data = ["libraries"]
     arguments = {
-        "ns": (lambda an, av: an == "ns", Raw(str)),
+        "ns": (lambda an, av: an == "ns", Raw(str), True),
     }
 
     def run(self):

@@ -9,7 +9,7 @@ from expression import Expression
 
 class If(Component):
     arguments = {
-        "cond": (lambda an, av: an == "cond", Expression(bool)),
+        "cond": (lambda an, av: an == "cond", Expression(bool), True),
     }
 
     cond: Tuple[str, bool]

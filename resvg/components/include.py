@@ -14,9 +14,9 @@ class Include(Component):
     url_regex = re.compile("/+")
     
     arguments = {
-        "url": (lambda an, av: an == "url", Raw(str)),
-        "kup": (lambda an, av: an == "kup", Raw(str)),
-        "path": (lambda an, av: an == "path", Raw(str)),
+        "url": (lambda an, av: an == "url", Raw(str), False),
+        "kup": (lambda an, av: an == "kup", Raw(str), False),
+        "path": (lambda an, av: an == "path", Raw(str), False),
     }
 
     url: Tuple[str, bool]

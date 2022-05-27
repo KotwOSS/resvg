@@ -25,6 +25,8 @@ class Settings:
     year = 2022
 
     resvg_namespace: str = "{http://oss.kotw.dev/resvg}"
+    exp_namespace: str = "{http://oss.kotw.dev/resvg/expression}"
+    svg_namespace: str = "{http://www.w3.org/2000/svg}"
     
 
     lib_dir: str

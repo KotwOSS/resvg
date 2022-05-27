@@ -13,7 +13,7 @@ class Repeat(Component):
     use_before = True
     use_after = True
     arguments = {
-        "var": (lambda an, av: True, Expression(int | range | xrange)),
+        "var": (lambda an, av: True, Expression(int | range | xrange), True),
     }
 
     start: float
@@ -61,7 +61,7 @@ class Repeat(Component):
 class While(Component):
     use_after = True
     arguments = {
-        "cond": (lambda an, av: True, Raw(SafeExpression, bool)),
+        "cond": (lambda an, av: an == "cond", Raw(SafeExpression, bool), True),
     }
 
     cond: Tuple[str, SafeExpression]

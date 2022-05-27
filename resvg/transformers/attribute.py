@@ -28,8 +28,8 @@ class AttributeTransformer(Transformer):
                 ),
             )
 
-            if attrname.startswith(Settings.resvg_namespace):
-                name = attrname[len(Settings.resvg_namespace) :]
+            if attrname.startswith(Settings.exp_namespace):
+                name = attrname[len(Settings.exp_namespace) :]
                 el.attrib[name] = reutil.stringify(
                     SafeExpression(attrval, self.transform.vars, Any).eval()
                 )

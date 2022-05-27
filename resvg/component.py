@@ -16,7 +16,7 @@ from settings import Settings
 
 class Component(ABC):
     components: Dict[str, Type[Component]] = {}
-    arguments: Dict[str, (Callable[[str, str], bool], Evaluator)] | None = None
+    arguments: Dict[str, (Callable[[str, str], bool], Evaluator, bool)] | None = None
     use_before: bool = False
     use_after: bool = False
     use_last: bool = False
@@ -47,11 +47,24 @@ class Component(ABC):
                 setattr(self, dtkey, self.data.get(dtkey))
             
         if self.arguments:
+            # TODO: Make prettier and more performant
+            
+            for n, t in self.arguments.items():
+                if n.endswith("*"):
+                    setattr(self, n[:-1], [])
+                    
             for an, av in self.el.attrib.items():
-                for n, (k, v) in self.arguments.items():
+                for n, (k, v, r) in self.arguments.items():
                     if k(an, av):
-                        setattr(self, n, (an, v.parse(self.transform, av)))
+                        if n.endswith("*"):
+                            getattr(self, n[:-1]).append((an, v.parse(self.transform, av)))
+                        else:
+                            setattr(self, n, (an, v.parse(self.transform, av)))
                         break
+            
+            for n, (k, v, r) in self.arguments.items():
+                if r and not hasattr(self, n[:-1] if n.endswith("*") else n):
+                   raise RuntimeError(f"Component '§o{self.__class__.__name__}§R' is missing required argument §o{n}§R")
         
         (self._before if self.use_before else self._run)()
 
