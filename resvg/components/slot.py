@@ -24,4 +24,4 @@ class Slot(Component):
                 self.move_before()
                 self.destroy(children=False)
         else:
-            self.destroy(children=True)
+            raise RuntimeError("Slot component can only be in a §ocomp§R component")

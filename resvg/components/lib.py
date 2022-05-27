@@ -5,13 +5,17 @@
 from __future__ import annotations
 from typing import Dict, List
 from component import Component
+import logging
 from raw import Raw
 from lxml import etree
 
 class Library:
     components: Dict[str, List[etree._Element]]
-    def __init__(self):
+    ns: str
+    
+    def __init__(self, ns):
         self.components = {}
+        self.ns = ns
 
 class Lib(Component):
     use_last = True
@@ -22,15 +26,22 @@ class Lib(Component):
 
     def run(self):
         if not self.data.has("library"):
-            library = Library()
-            
             ns = self.ns[1]
-            self.libraries[ns] = library
+            
+            logging.debug("start library §o%s§R", ns)
+            
+            if ns in self.libraries:
+                library = self.libraries[ns]
+            else:
+                logging.info("Registered library §o%s§R", ns)
+                library = Library(ns)
+                self.libraries[ns] = library
             
             self.data.set("library", library)
         else:
             raise RuntimeError("Library component can not be in another library")
 
     def last(self):
+        logging.debug("end library")
         self.data.remove("library")
         self.destroy(children=False)

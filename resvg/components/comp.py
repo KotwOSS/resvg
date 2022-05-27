@@ -6,6 +6,7 @@ from __future__ import annotations
 from component import Component
 from raw import Raw
 from components.lib import Library
+import logging
 
 class Comp(Component):
     arguments = {
@@ -14,8 +15,11 @@ class Comp(Component):
 
     def run(self):
         if self.data.has("library"):
-            self.data.get("library", Library).components[self.name[1]] = self.clone_children(add_jobs=False)
+            name = self.name[1]
+            library: Library = self.data.get("library")
+            logging.info("Registered component §o%s§R:§o%s§R", library.ns, name)
+            library.components[name] = self.clone_children(add_jobs=False)
         else:
-            raise RuntimeError("Comp components can only be in a library")
+            raise RuntimeError("§ocomp§R components can only be in a library")
 
         self.destroy()

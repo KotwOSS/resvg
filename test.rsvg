@@ -1,16 +1,27 @@
 <svg 
     xmlns="http://www.w3.org/2000/svg" 
     xmlns:re="http://oss.kotw.dev/resvg"
-    xmlns:graph="graph"
+    xmlns:greet="greet"
     width="100" height="100"
 >
-    <re:lib ns="graph">
-        <re:comp name="line">
-            <p>abc</p>
+    <!-- Our library -->
+    <re:lib ns="greet">
+        <!-- Our pancaker component -->
+        <re:comp name="pancaker">
+            <p>Hey, </p>
+            <re:slot>
+                <!-- If slot is empty, X Man will be greeted -->
+                <p>X Man</p>
+            </re:slot>
+            <p>Do you like pancakes?</p>
         </re:comp>
     </re:lib>
 
-    <graph:line>
-        
-    </graph:line>
+    <!-- Greet X Man -->
+    <greet:pancaker />
+
+    <!-- Greet Neo -->
+    <greet:pancaker>
+        <p>Neo</p>
+    </greet:pancaker>
 </svg>
