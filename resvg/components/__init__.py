@@ -9,6 +9,7 @@ from .lib import *
 from .comp import *
 from .slot import *
 from .fragment import *
+from .include import *
 
 def register():
     """Register the components"""
@@ -20,3 +21,4 @@ def register():
     Component.define_ns("comp", Comp)
     Component.define_ns("slot", Slot)
     Component.define_ns("fragment", Fragment)
+    Component.define_ns("include", Include)

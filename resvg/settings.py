@@ -25,7 +25,9 @@ class Settings:
     year = 2022
 
     resvg_namespace: str = "{http://oss.kotw.dev/resvg}"
+    
 
+    lib_dir: str
     no_color: bool
     comments: bool
     min_time: float

@@ -86,6 +86,7 @@ def parse():
         "trust": ["enable trust for statements and expressions", "store_true"],
         "hide-logo": ["hide logo", "store_true"],
         "comments": ["keep the comments from the ReSVG file", "store_true"],
+        "lib-dir": ["specify the directory where the relibs will be saved to", str, ".relib"],
     }
 
     for arg, info in args.items():
@@ -118,6 +119,7 @@ def parse():
     Settings.watch = args.watch
     Settings.min_time = args.min_time
     Settings.no_color = args.no_color
+    Settings.lib_dir = args.lib_dir
 
     logger.setup_logger()
 

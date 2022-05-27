@@ -4,9 +4,5 @@
     xmlns:greet="greet"
     width="100" height="100"
 >
-    <re:run>x=0</re:run>
-    <re:while cond="x smaller 6">
-        <abc re:a="x"></abc>
-        <re:run>x+=2</re:run>
-    </re:while>
+    <re:include kup="nymMlWG" />
 </svg>
