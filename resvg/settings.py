@@ -2,8 +2,7 @@
 #
 # Copyright (c) 2022 KotwOSS
 
-import logging
-import math, random, numpy, reutil, domlib
+import math, random, numpy, reutil, domlib, re, logging
 from typing import Any, Callable
 from xrange import xrange
 
@@ -44,6 +43,18 @@ class Settings:
     level: int
 
     transformer: Any
+    
+    smaller_regex = re.compile("\s*smaller\s*")
+    greater_regex = re.compile("\s*greater\s*")
+    smequal_regex = re.compile("\s*smequal\s*")
+    grequal_regex = re.compile("\s*grequal\s*")
+
+    def proccess_operation(operation: str) -> str:
+        operation = Settings.smaller_regex.sub("<", operation)
+        operation = Settings.greater_regex.sub(">", operation)
+        operation = Settings.smequal_regex.sub("<=", operation)
+        operation = Settings.grequal_regex.sub("<=", operation)
+        return operation.strip()
 
     globals = {
         "__import__": NotAllowed("__import__"),

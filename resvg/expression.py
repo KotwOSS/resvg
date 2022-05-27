@@ -5,8 +5,8 @@
 from __future__ import annotations
 from typing import Any, Dict, Type, TypeVar
 from evaluator import Evaluator
-import logging, transform
 from settings import Settings
+import logging, transform, re
 
 T = TypeVar("T")
 
@@ -19,9 +19,9 @@ class Expression(Evaluator[T]):
         return SafeExpression(txt, transformer.vars, self.expected).eval()
 
 
-class SafeExpression:
+class SafeExpression:    
     def __init__(self, expression: str, locals: Dict[str, Any], expected: Type[T]):
-        self.expression = expression
+        self.expression = Settings.proccess_operation(expression)
         self.locals = locals
         self.expected = expected
 

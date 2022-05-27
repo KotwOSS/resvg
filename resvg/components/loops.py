@@ -4,7 +4,8 @@
 
 from typing import Tuple
 from component import Component
-from expression import Expression
+from expression import Expression, SafeExpression
+from raw import Raw
 from xrange import xrange
 
 
@@ -52,6 +53,26 @@ class Repeat(Component):
         self.num += self.step
 
         return self.should_run()
+
+    def after(self):
+        self.destroy()
+
+
+class While(Component):
+    use_after = True
+    arguments = {
+        "cond": (lambda an, av: True, Raw(SafeExpression, bool)),
+    }
+
+    cond: Tuple[str, SafeExpression]
+
+    def run(self):
+        if self.cond[1].eval():
+            self.clone_before()
+
+            return True
+        else:
+            return False
 
     def after(self):
         self.destroy()

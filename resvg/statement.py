@@ -12,7 +12,7 @@ class SafeStatement:
     import_regex = re.compile(r"import\s+.+")
 
     def __init__(self, statement: str, locals: Dict[str, Any]):
-        self.statement = statement.strip()
+        self.statement = Settings.proccess_operation(statement)
         self.locals = locals
 
     def exec(self):

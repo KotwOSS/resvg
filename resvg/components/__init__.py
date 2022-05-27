@@ -2,7 +2,7 @@
 #
 # Copyright (c) 2022 KotwOSS
 
-from .repeat import *
+from .loops import *
 from .run import *
 from .conditions import *
 from .lib import *
@@ -13,6 +13,7 @@ from .fragment import *
 def register():
     """Register the components"""
     Component.define_ns("repeat", Repeat)
+    Component.define_ns("while", While)
     Component.define_ns("run", Run)
     Component.define_ns("if", If)
     Component.define_ns("lib", Lib)
