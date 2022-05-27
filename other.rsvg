@@ -1,4 +1,0 @@
-<fragment>
-    Hello ${name}
-    <h1>Cheeseburger</h1>
-</fragment>

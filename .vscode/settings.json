@@ -1,5 +1,20 @@
 {
 	"files.associations": {
 		"*.rsvg": "svg"
+	},
+	"fileHeaderComment.parameter": {
+		"*": {
+			"commentbegin": "",
+			"commentprefix": "#",
+			"commentend": " ",
+			"company": "KotwOSS"
+		}
+	},
+	"fileHeaderComment.template": {
+		"*": [
+			"${commentprefix} Created on ${date}",
+			"${commentprefix}",
+			"${commentprefix} Copyright (c) ${year} ${company}"
+		]
 	}
 }
