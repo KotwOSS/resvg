@@ -10,7 +10,7 @@ import transform
 
 class Transformer(ABC):
     transform: "transform.Transform"
-    data: "transform.Datacontainer"
+    data: "transform.Data"
 
     def __init__(self, transform: transform.Transform):
         self.transform = transform

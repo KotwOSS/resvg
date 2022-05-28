@@ -59,7 +59,7 @@ This project is licensed under the [Mit License](https://mit-license.org/)
     ```
 5. [Comp](examples/comp/doc.md)
     ```xml
-    <re:comp name="{raw(str)}" />
+    <re:comp name="{raw(str)}" *args />
     ```
 6. [Path](examples/path/doc.md)
     ```xml

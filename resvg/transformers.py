@@ -61,6 +61,13 @@ class CustomTransformer(Transformer):
         el: etree._Element
 
         def run(self):
+            for (an, av) in self.el.attrib.items():
+                if an.startswith(Settings.resvg_namespace):
+                    name = an[len(Settings.resvg_namespace):]
+                    self.transform.set_var(name, SafeExpression(av, self.transform.vars, Any).eval())
+                else:
+                    self.transform.set_var(an, av)
+            
             self.slots.append(self.el.getchildren())
 
             cloned = [self.clone(el, add_jobs=True) for el in self.comp]
