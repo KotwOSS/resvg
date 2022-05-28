@@ -4,7 +4,7 @@
 
 from typing import List
 from component import Component
-from expression import Expression
+from evaluator import Expression
 from lxml import etree
 
 

@@ -4,7 +4,7 @@
 
 from __future__ import annotations
 from component import Component
-from raw import Raw
+from evaluator import Raw
 from components.lib import Library
 import logging
 

@@ -3,7 +3,7 @@
 # Copyright (c) 2022 KotwOSS
 
 from component import Component
-from statement import SafeStatement
+from evaluator import SafeStatement
 
 
 class Run(Component):

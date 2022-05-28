@@ -5,7 +5,7 @@
 from typing import Tuple
 from component import Component
 from settings import Settings
-from raw import Raw
+from evaluator import Raw
 from lxml import etree
 import requests, os, re, logging
 
