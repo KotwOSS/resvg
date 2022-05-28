@@ -1,0 +1,9 @@
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:re="http://oss.kotw.dev/resvg"
+>
+    <re:run>
+# Prints 'Hello, World!' into the console
+logging.info("Hello, world!")
+    </re:run>
+</svg>

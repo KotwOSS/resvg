@@ -23,10 +23,14 @@ class MultiExpression(Evaluator[Any]):
 
     def parse(self, transformer: transform.Transform, txt: str) -> Any:
         parts = txt.split(";")
+        parts_l = len(parts)
+        expected_l = len(self.expected)
         if len(parts) == len(self.expected):
             for i, p in enumerate(parts):
                 parts[i] = SafeExpression(p, transformer.vars, self.expected[i]).eval()
-        return parts
+            return parts
+        else:
+            raise ValueError(f"Expected §o{expected_l}§R parts, got §o{parts_l}§R!")
 
 # ANCHOR: Expression
 class Expression(Evaluator[T]):

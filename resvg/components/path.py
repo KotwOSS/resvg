@@ -100,6 +100,7 @@ class Path(Component):
 
             self.el.tag = Settings.svg_namespace + "path"
             self.el.attrib["d"] = path_d
+            
 
 # ANCHOR: LineTo
 class LineTo(Component):

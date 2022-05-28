@@ -66,6 +66,9 @@ class Component(ABC):
                         else:
                             setattr(self, name, val)
                             break
+                        
+                if multiple:
+                    setattr(self, name, multiple_l)
                 
                 if required and not hasattr(self, name):
                     raise RuntimeError(

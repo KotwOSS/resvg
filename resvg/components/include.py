@@ -43,7 +43,7 @@ class Include(Component):
                 with open(lib_path, "wb") as f:
                     f.write(response.content)
         elif hasattr(self, "path"):
-            lib_path = self.path[1]
+            lib_path = os.path.join(Settings.lookup_dir, self.path[1])
         else:
             raise RuntimeError(
                 "§oinclude§R components must have an §ourl§R or §okup§R or §opath§R argument"

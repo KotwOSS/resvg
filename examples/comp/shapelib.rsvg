@@ -1,0 +1,39 @@
+<re:lib ns="shapelib" xmlns:re="http://oss.kotw.dev/resvg">
+    <re:comp name="circle">
+        <re:run>
+vars = list(filter(
+    lambda e: not e[0] in ["r", "x", "y"],
+    locals().items()
+))
+        </re:run>
+        <re:path
+            re:translate="x;y"
+            re:insert="vars"
+        >
+            <re:moveto x="0" y="r" />
+            <re:repeat rot="xrange(0, math.pi*2, 0.2)">
+                <re:lineto x="sin(rot)*r" y="cos(rot)*r" />
+            </re:repeat>
+            <re:close />
+        </re:path>
+    </re:comp>
+    <re:comp name="square">
+        <re:run>
+vars = list(filter(
+    lambda e: not e[0] in ["a", "x", "y"],
+    locals().items()
+))
+        </re:run>
+        <re:path
+            re:translate="x;y"
+            re:insert="vars"
+        >
+            <re:moveto x="0" y="0" />
+            <re:lineto x="a" y="0" />
+            <re:lineto x="a" y="a" />
+            <re:lineto x="0" y="a" />
+            <re:close />
+        </re:path>
+    </re:comp>
+</re:lib>
+    

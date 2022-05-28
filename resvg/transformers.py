@@ -2,7 +2,7 @@
 #
 # Copyright (c) 2022 KotwOSS
 
-from typing import Any, List
+from typing import Any, Dict, List, Tuple
 from transformer import Transformer
 from evaluator import SafeExpression
 from settings import Settings
@@ -11,11 +11,11 @@ from lxml import etree
 from transform import Transform
 import reutil, re
 
+
 # ANCHOR: AttributeTransformer
 class AttributeTransformer(Transformer):
-    expression_regex = re.compile(r"{([a-zA-Z0-9.*/+-^()\"' ]+)}")
-
     """Transform expressions in attributes"""
+    expression_regex = re.compile(r"{([a-zA-Z0-9.*/+-^()\"' ]+)}")
 
     def __call__(self, el: etree._Element) -> bool:
         for attr in el.attrib.items():
@@ -31,11 +31,22 @@ class AttributeTransformer(Transformer):
             )
 
             if attrname.startswith(Settings.exp_namespace):
-                name = attrname[len(Settings.exp_namespace) :]
+                name = attrname[len(Settings.exp_namespace):]
                 el.attrib[name] = reutil.stringify(
                     SafeExpression(attrval, self.transform.vars, Any).eval()
                 )
                 del el.attrib[attrname]
+            elif attrname.startswith(Settings.resvg_namespace):
+                name = attrname[len(Settings.resvg_namespace):]
+                if name == "insert":
+                    res = SafeExpression(attrval, self.transform.vars, Dict | List).eval()
+                    
+                    if isinstance(res, Dict):
+                        res = res.items()
+                    
+                    for (n, v) in res:
+                        el.attrib[n] = reutil.stringify(v)
+                    del el.attrib[attrname]
             else:
                 el.attrib[attrname] = attrval
         return False
@@ -61,12 +72,18 @@ class CustomTransformer(Transformer):
         el: etree._Element
 
         def run(self):
+            self.transform.append_scope(clone=False)
+            
             for (an, av) in self.el.attrib.items():
                 if an.startswith(Settings.resvg_namespace):
                     name = an[len(Settings.resvg_namespace):]
-                    self.transform.set_var(name, SafeExpression(av, self.transform.vars, Any).eval())
+                    val = SafeExpression(av, self.transform.vars, Any).eval()
                 else:
-                    self.transform.set_var(an, av)
+                    name, val = an, av
+                
+                name = name.replace("-", "_")
+                
+                self.transform.set_var(name, val)
             
             self.slots.append(self.el.getchildren())
 
@@ -79,6 +96,8 @@ class CustomTransformer(Transformer):
 
         def last(self):
             self.slots.pop()
+            
+            self.transform.pop_scope()
     
     def add_jobs(self, el: etree._Element, include_self: bool = True):
         """Add child jobs"""

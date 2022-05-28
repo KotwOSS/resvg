@@ -4,7 +4,7 @@
 
 import math, random, numpy, reutil, domlib, re, logging
 from typing import Any, Callable
-from xrange import xrange
+from ranges import xrange, brange
 
 
 class NotAllowed(Callable):
@@ -28,6 +28,7 @@ class Settings:
     exp_namespace: str = "{http://oss.kotw.dev/resvg/expression}"
     svg_namespace: str = "{http://www.w3.org/2000/svg}"
 
+    lookup_dir: str
     lib_dir: str
     no_color: bool
     comments: bool
@@ -65,7 +66,16 @@ class Settings:
         "open": NotAllowed("open"),
         "eval": NotAllowed("eval"),
         "exec": NotAllowed("exec"),
+        "locals": locals,
+        "globals": globals,
+        "list": list,
+        "int": int,
+        "float": float,
+        "bool": bool,
         "math": math,
+        "filter": filter,
+        "map": map,
+        "iter": iter,
         "random": random,
         "sin": math.sin,
         "cos": math.cos,
@@ -83,6 +93,7 @@ class Settings:
         "log10": math.log10,
         "range": range,
         "xrange": xrange,
+        "brange": brange,
         "numpy": numpy,
         "print": print,
         "logging": logging,

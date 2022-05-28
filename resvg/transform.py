@@ -60,6 +60,7 @@ class Transform:
     transformers: List[Transformer]
     root: etree._Element
     vars: Dict[str, Any]
+    var_scopes: List[Dict[str, Any]]
     queue: List[etree._Element | Callable]
     active: etree._Element
     data: Data
@@ -69,6 +70,7 @@ class Transform:
         self.queue = list(root.iter())
         self.queue.reverse()
         self.vars = {}
+        self.var_scopes = [self.vars]
         self.data = Data()
         self.transformers = []
 
@@ -103,6 +105,17 @@ class Transform:
         for transformer in self.transformers:
             if transformer(el):
                 return
+    
+    def append_scope(self, clone: bool = True):
+        """Append a new scope"""
+        scope = self.vars.copy() if clone else {}
+        self.var_scopes.append(scope)
+        self.vars = scope
+
+    def pop_scope(self):
+        """Pop a scope"""
+        self.var_scopes.pop()
+        self.vars = self.var_scopes[len(self.var_scopes) - 1]
 
     def set_var(self, name: str, value: Any):
         """Set a variable"""

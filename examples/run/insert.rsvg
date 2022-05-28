@@ -1,0 +1,11 @@
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:re="http://oss.kotw.dev/resvg"
+>
+    <re:run>
+# Inserts h1 element before this component
+myel = dom.create("h1")
+myel.text = "Hello world!"
+dom.insert_before(myel)
+    </re:run>
+</svg>

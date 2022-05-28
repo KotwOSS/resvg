@@ -41,39 +41,39 @@ This project is licensed under the [Mit License](https://mit-license.org/)
 
 ## Components
 
-1. [Repeat](examples/repeat/doc.md)
+1. [Repeat](examples/repeat/README.md)
    ```xml
    <re:repeat {var}="{exp(int | range | xrange)}" />
    ```
-2. [While](examples/while/doc.md)
+2. [While](examples/while/README.md)
     ```xml
     <re:while cond="{exp(bool)}" />
     ```
-3. [If](examples/if/doc.md)
+3. [If](examples/if/README.md)
     ```xml
     <re:if cond="{exp(bool)}" />
     ```
-4. [Lib](examples/lib/doc.md)
+4. [Lib](examples/lib/README.md)
     ```xml
     <re:lib ns="{raw(str)}" />
     ```
-5. [Comp](examples/comp/doc.md)
+5. [Comp](examples/comp/README.md)
     ```xml
     <re:comp name="{raw(str)}" *args />
     ```
-6. [Path](examples/path/doc.md)
+6. [Path](examples/path/README.md)
     ```xml
     <re:path re:transform="{exp(float)};{exp(float)}" *args />
     ```
-7. [Include](examples/include/doc.md)
+7. [Include](examples/include/README.md)
     ```xml
     <re:include kup="{raw(str)}" url="{raw(str)}" path="{raw(str)}" />
     ```
-8. [Slot](examples/slot/doc.md)
+8. [Slot](examples/slot/README.md)
     ```xml
     <re:slot/>
     ```
-9.  [Run](examples/run/doc.md)
+9.  [Run](examples/run/README.md)
     ```xml
     <re:run/>
     ```
