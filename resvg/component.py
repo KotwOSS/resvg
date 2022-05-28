@@ -47,27 +47,29 @@ class Component(ABC):
                 setattr(self, dtkey, self.data.get(dtkey))
 
         if self.arguments:
-            # TODO: Make prettier and more performant
+            attrib = self.el.attrib
+            attrib_i = attrib.items()
 
-            for n, t in self.arguments.items():
-                if n.endswith("*"):
-                    setattr(self, n[:-1], [])
-
-            for an, av in self.el.attrib.items():
-                for n, (k, v, r) in self.arguments.items():
-                    if k(an, av):
-                        if n.endswith("*"):
-                            getattr(self, n[:-1]).append(
-                                (an, v.parse(self.transform, av))
-                            )
+            for name, (tester, evaluator, required) in self.arguments.items():
+                multiple = False
+                
+                if name.endswith("*"):
+                    multiple_l = []
+                    multiple = True
+                    name = name[:-1]
+                
+                for aname, avalue in attrib_i:
+                    if tester(aname, avalue):
+                        val = (aname, evaluator.parse(self.transform, avalue))
+                        if multiple:
+                            multiple_l.append(val)
                         else:
-                            setattr(self, n, (an, v.parse(self.transform, av)))
-                        break
-
-            for n, (k, v, r) in self.arguments.items():
-                if r and not hasattr(self, n[:-1] if n.endswith("*") else n):
+                            setattr(self, name, val)
+                            break
+                
+                if required and not hasattr(self, name):
                     raise RuntimeError(
-                        f"Component '§o{self.__class__.__name__}§R' is missing required argument §o{n}§R"
+                        f"Component '§o{self.__class__.__name__}§R' is missing required argument §o{name}§R"
                     )
 
         (self._before if self.use_before else self._run)()
@@ -144,7 +146,9 @@ class Component(ABC):
         """Adds a job to the main job queue after the last transform task"""
         itr = self.el.iter()
         lastchild = last(itr)
-        if lastchild != None:
+        if lastchild == self.el:
+            self.transform.add_job(job)
+        elif lastchild != None:
             indx = self.transform.queue.index(lastchild)
             self.transform.insert_job(job, indx)
 
