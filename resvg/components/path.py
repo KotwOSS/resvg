@@ -27,7 +27,11 @@ class Path(Component):
 
     def run(self):
         # By default the current_point is 0, 0 not None
-        self.data.get_or_set("current_point", se.Point(0, 0))
+        
+        self.data.set("current_point", 
+                      self.data.get("path").current_point \
+                          if self.data.has("path") \
+                              else se.Point(0, 0))
        
         path = se.Path()
        
@@ -193,7 +197,7 @@ class Reverse(Component):
     def run(self):
         # Placeholder needed for reversing lonely paths
         self.path.insert(0, se.Move(self.current_point) )
-        # Remove the paths
+        # Reverse the paths
         self.path.reverse()
         # Remove placeholder
         self.path.pop(0)
