@@ -2,14 +2,14 @@
 #
 # Copyright (c) 2022 KotwOSS
 
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List
 from transformer import Transformer
-from evaluator import SafeExpression
+from evaluator import SafeExpression, Expression, Raw
 from settings import Settings
 from component import Component
 from lxml import etree
 from transform import Transform
-import reutil, re
+import reutil, re, logging
 
 
 # ANCHOR: AttributeTransformer
@@ -36,6 +36,7 @@ class AttributeTransformer(Transformer):
                     SafeExpression(attrval, self.transform.vars, Any).eval()
                 )
                 del el.attrib[attrname]
+                continue
             elif attrname.startswith(Settings.resvg_namespace):
                 name = attrname[len(Settings.resvg_namespace):]
                 if name == "insert":
@@ -47,8 +48,8 @@ class AttributeTransformer(Transformer):
                     for (n, v) in res:
                         el.attrib[n] = reutil.stringify(v)
                     del el.attrib[attrname]
-            else:
-                el.attrib[attrname] = attrval
+                    continue
+            el.attrib[attrname] = attrval
         return False
 
 # ANCHOR: ComponentTransformer
@@ -64,27 +65,32 @@ class ComponentTransformer(Transformer):
 class CustomTransformer(Transformer):
     # ANCHOR: Custom
     class Custom(Component):
-        arguments = {}
-        # use_last = True
+        
         use_data = ["slots"]
 
+        slots: List[List[etree._Element]]
         comp: List[etree._Element]
         el: etree._Element
-
+        
+        arguments = {
+            "any_re*": (lambda an, av: an.startswith(Settings.resvg_namespace), Expression(Any), True),
+            "any*": (lambda an, av: True, Raw(str), True)
+        }
+        
         def run(self):
             self.transform.append_scope(clone=False)
             
-            for (an, av) in self.el.attrib.items():
-                if an.startswith(Settings.resvg_namespace):
-                    name = an[len(Settings.resvg_namespace):]
-                    val = SafeExpression(av, self.transform.vars, Any).eval()
-                else:
-                    name, val = an, av
-                
-                name = name.replace("-", "_")
-                
-                self.transform.set_var(name, val)
+            resvg_ns_l = len(Settings.resvg_namespace)
+            for (an, av) in self.any_re:
+                an = an[resvg_ns_l:].replace("-", "_")
+                if not an in self.transform.vars:
+                    self.transform.set_var(an, av)
             
+            for (an, av) in self.any:
+                an = an.replace("-", "_")
+                if not an in self.transform.vars:
+                    self.transform.set_var(an, av)
+                    
             self.slots.append(self.el.getchildren())
 
             cloned = [self.clone(el, add_jobs=True) for el in self.comp]
@@ -113,6 +119,7 @@ class CustomTransformer(Transformer):
         if ns in libraries:
             lib = libraries[ns]
             if ln in lib.components:
+                logging.debug("insert §o%s§R:§o%s§R", ns, ln)
                 comp = CustomTransformer.Custom(self.transform, el)
                 comp.comp = lib.components[ln]
                 comp.parse()

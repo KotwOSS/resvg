@@ -73,6 +73,8 @@ class Settings:
         "float": float,
         "bool": bool,
         "math": math,
+        "hex": hex,
+        "str": str,
         "filter": filter,
         "map": map,
         "iter": iter,

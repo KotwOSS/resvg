@@ -8,7 +8,7 @@ from more_itertools import last
 from transform import Data, Transform
 from abc import ABC, abstractmethod
 from copy import deepcopy
-from typing import Callable, Dict, List, Type
+from typing import Callable, Dict, List, Tuple, Type
 from lxml import etree
 from evaluator import Evaluator
 from settings import Settings
@@ -16,7 +16,7 @@ from settings import Settings
 
 class Component(ABC):
     components: Dict[str, Type[Component]] = {}
-    arguments: Dict[str, (Callable[[str, str], bool], Evaluator, bool)] | None = None
+    arguments: Dict[str, Tuple[Callable[[str, str], bool], Evaluator, bool]] | None = None
     use_before: bool = False
     use_after: bool = False
     use_last: bool = False
@@ -47,8 +47,7 @@ class Component(ABC):
                 setattr(self, dtkey, self.data.get(dtkey))
 
         if self.arguments:
-            attrib = self.el.attrib
-            attrib_i = attrib.items()
+            attrib = dict(self.el.attrib)
 
             for name, (tester, evaluator, required) in self.arguments.items():
                 multiple = False
@@ -58,13 +57,15 @@ class Component(ABC):
                     multiple = True
                     name = name[:-1]
                 
-                for aname, avalue in attrib_i:
+                for aname, avalue in list(attrib.items()):
                     if tester(aname, avalue):
                         val = (aname, evaluator.parse(self.transform, avalue))
                         if multiple:
                             multiple_l.append(val)
+                            del attrib[aname]
                         else:
                             setattr(self, name, val)
+                            del attrib[aname]
                             break
                         
                 if multiple:

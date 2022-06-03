@@ -10,6 +10,7 @@ from .comp import *
 from .slot import *
 from .fragment import *
 from .include import *
+from .default import *
 from .path import *
 
 
@@ -24,9 +25,12 @@ def register():
     Component.define_ns("slot", Slot)
     Component.define_ns("fragment", Fragment)
     Component.define_ns("include", Include)
+    Component.define_ns("default", Default)
     # Path components
     Component.define_ns("path", Path)
     Component.define_ns("moveto", MoveTo)
     Component.define_ns("lineto", LineTo)
     Component.define_ns("line", Line)
     Component.define_ns("close", Close)
+    Component.define_ns("bezier", Bezier)
+    Component.define_ns("reverse", Reverse)
