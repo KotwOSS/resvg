@@ -19,6 +19,11 @@ class Path(Component):
             Raw(str),
             False,
         ),
+        "origin": (
+            lambda an, av: an == Settings.resvg_namespace + "origin",
+            MultiExpression(float, float),
+            False,
+        ),
         "args*": (lambda an, av: True, Raw(str), True),
     }
 
@@ -34,19 +39,28 @@ class Path(Component):
                               else se.Point(0, 0))
        
         path = se.Path()
-       
-        if hasattr(self, "transformation"):
-            var, transformation = self.transformation
-            logging.debug("adding transformation: §o%s§R", transformation)
-            path *= se.Matrix().parse(transformation)
-            
-            del self.el.attrib[var]
         
         self.paths.append(path)
         self.data.set("path", path)
 
     def last(self):
         path = self.paths.pop()
+        
+        origin = 0, 0
+        if hasattr(self, "origin"):
+            var, origin = self.origin
+            del self.el.attrib[var]
+        
+        path *= se.Matrix.translate(-origin[0], -origin[1])
+        
+        if hasattr(self, "transformation"):
+            var, transformation = self.transformation
+            logging.debug("adding transformation: §o%s§R", transformation)
+            path *= se.Matrix(transformation)
+            
+            del self.el.attrib[var]
+        
+        path *= se.Matrix.translate(origin[0], origin[1])
         
         path.reify()
 
@@ -196,9 +210,9 @@ class Reverse(Component):
 
     def run(self):
         # Placeholder needed for reversing lonely paths
-        self.path.insert(0, se.Move(self.current_point) )
+        self.path.append(se.Line(self.current_point, end=(6, 0)))
         # Reverse the paths
         self.path.reverse()
         # Remove placeholder
-        self.path.pop(0)
+        self.path.pop()
         self.destroy()
