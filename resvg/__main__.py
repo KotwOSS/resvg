@@ -22,6 +22,7 @@ required_modules = [
     "numpy",
     "more_itertools",
     "requests",
+    "svgelements"
 ]
 
 for required in required_modules:

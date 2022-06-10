@@ -60,6 +60,7 @@ class Transform:
     transformers: List[Transformer]
     root: etree._Element
     vars: Dict[str, Any]
+    var_scopes: List[Dict[str, Any]]
     queue: List[etree._Element | Callable]
     active: etree._Element
     data: Data
@@ -69,6 +70,7 @@ class Transform:
         self.queue = list(root.iter())
         self.queue.reverse()
         self.vars = {}
+        self.var_scopes = [self.vars]
         self.data = Data()
         self.transformers = []
 
@@ -93,8 +95,10 @@ class Transform:
         if isinstance(item, etree._Comment):
             logging.debug("Skipping comment '§g%s§R'", item.text.strip())
         elif isinstance(item, etree._Element):
+            logging.debug("transforming §b%s§R", item.tag)
             self.parse_element(item)
         elif isinstance(item, Callable):
+            logging.debug("running §y%s§R", item.__name__)
             item()
 
     def parse_element(self, el: etree._Element):
@@ -103,10 +107,27 @@ class Transform:
         for transformer in self.transformers:
             if transformer(el):
                 return
+    
+    def insert_scope(self, scope: Dict[str, Any]):
+        """Insert a scope"""
+        self.var_scopes.append(scope)
+        self.vars = scope
+    
+    def append_scope(self, clone: bool = True):
+        """Append a new scope"""
+        scope = self.vars.copy() if clone else {}
+        self.var_scopes.append(scope)
+        self.vars = scope
+
+    def pop_scope(self) -> Dict[str, Any]:
+        """Pop a scope"""
+        res = self.var_scopes.pop()
+        self.vars = self.var_scopes[len(self.var_scopes) - 1]
+        return res
 
     def set_var(self, name: str, value: Any):
         """Set a variable"""
-        logging.debug("Setting §o%s§R to §o%s§R", name, value)
+        logging.debug("set §o%s§R to §o%s§R", name, value)
         self.vars[name] = value
 
     def add_job(self, job: Callable):

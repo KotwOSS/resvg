@@ -4,7 +4,7 @@
 
 from typing import Tuple
 from component import Component
-from expression import Expression
+from evaluator import Expression
 
 
 class If(Component):

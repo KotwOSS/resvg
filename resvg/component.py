@@ -8,7 +8,7 @@ from more_itertools import last
 from transform import Data, Transform
 from abc import ABC, abstractmethod
 from copy import deepcopy
-from typing import Callable, Dict, List, Type
+from typing import Callable, Dict, List, Tuple, Type
 from lxml import etree
 from evaluator import Evaluator
 from settings import Settings
@@ -16,7 +16,7 @@ from settings import Settings
 
 class Component(ABC):
     components: Dict[str, Type[Component]] = {}
-    arguments: Dict[str, (Callable[[str, str], bool], Evaluator, bool)] | None = None
+    arguments: Dict[str, Tuple[Callable[[str, str], bool], Evaluator, bool]] | None = None
     use_before: bool = False
     use_after: bool = False
     use_last: bool = False
@@ -47,27 +47,33 @@ class Component(ABC):
                 setattr(self, dtkey, self.data.get(dtkey))
 
         if self.arguments:
-            # TODO: Make prettier and more performant
+            attrib = dict(self.el.attrib)
 
-            for n, t in self.arguments.items():
-                if n.endswith("*"):
-                    setattr(self, n[:-1], [])
-
-            for an, av in self.el.attrib.items():
-                for n, (k, v, r) in self.arguments.items():
-                    if k(an, av):
-                        if n.endswith("*"):
-                            getattr(self, n[:-1]).append(
-                                (an, v.parse(self.transform, av))
-                            )
+            for name, (tester, evaluator, required) in self.arguments.items():
+                multiple = False
+                
+                if name.endswith("*"):
+                    multiple_l = []
+                    multiple = True
+                    name = name[:-1]
+                
+                for aname, avalue in list(attrib.items()):
+                    if tester(aname, avalue):
+                        val = (aname, evaluator.parse(self.transform, avalue))
+                        if multiple:
+                            multiple_l.append(val)
+                            del attrib[aname]
                         else:
-                            setattr(self, n, (an, v.parse(self.transform, av)))
-                        break
-
-            for n, (k, v, r) in self.arguments.items():
-                if r and not hasattr(self, n[:-1] if n.endswith("*") else n):
+                            setattr(self, name, val)
+                            del attrib[aname]
+                            break
+                        
+                if multiple:
+                    setattr(self, name, multiple_l)
+                
+                if required and not hasattr(self, name):
                     raise RuntimeError(
-                        f"Component '§o{self.__class__.__name__}§R' is missing required argument §o{n}§R"
+                        f"Component '§o{self.__class__.__name__}§R' is missing required argument §o{name}§R"
                     )
 
         (self._before if self.use_before else self._run)()
@@ -144,7 +150,9 @@ class Component(ABC):
         """Adds a job to the main job queue after the last transform task"""
         itr = self.el.iter()
         lastchild = last(itr)
-        if lastchild != None:
+        if lastchild == self.el:
+            self.transform.add_job(job)
+        elif lastchild != None:
             indx = self.transform.queue.index(lastchild)
             self.transform.insert_job(job, indx)
 

@@ -90,7 +90,12 @@ def parse():
         "lib-dir": [
             "specify the directory where the relibs will be saved to",
             str,
-            ".relib",
+            ".relib"
+        ],
+        "lookup-dir": [
+            "specify the directory where the resvg files to include will be looked up",
+            str,
+            "."
         ],
     }
 
@@ -125,6 +130,7 @@ def parse():
     Settings.min_time = args.min_time
     Settings.no_color = args.no_color
     Settings.lib_dir = args.lib_dir
+    Settings.lookup_dir = args.lookup_dir
 
     logger.setup_logger()
 

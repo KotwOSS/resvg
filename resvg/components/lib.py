@@ -5,9 +5,9 @@
 from __future__ import annotations
 from typing import Dict, List
 from component import Component
-import logging
-from raw import Raw
+from evaluator import Raw
 from lxml import etree
+import logging
 
 
 class Library:

@@ -4,16 +4,15 @@
 
 from typing import Tuple
 from component import Component
-from expression import Expression, SafeExpression
-from raw import Raw
-from xrange import xrange
+from evaluator import Expression, SafeExpression, Raw
+from ranges import xrange, brange
 
 
 class Repeat(Component):
     use_before = True
     use_after = True
     arguments = {
-        "var": (lambda an, av: True, Expression(int | range | xrange), True),
+        "var": (lambda an, av: True, Expression(int | range | xrange | brange), True),
     }
 
     start: float
@@ -29,7 +28,7 @@ class Repeat(Component):
 
     def before(self):
         (self.var, varv) = self.var
-        if isinstance(varv, range) or isinstance(varv, xrange):
+        if isinstance(varv, range | xrange | brange):
             self.start = varv.start
             self.stop = varv.stop
             self.step = varv.step

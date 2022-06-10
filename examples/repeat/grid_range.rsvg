@@ -1,0 +1,22 @@
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:re="http://oss.kotw.dev/resvg"
+    xmlns:e="http://oss.kotw.dev/resvg/expression"
+    width="100"
+    height="100"
+>
+    <!-- 
+        When wanting to use ranges without decimal steps, you should use range
+    -->
+    <re:repeat x="range(0, 10)">
+        <re:repeat y="range(0, 10)">
+            <rect 
+                e:x="x*10" 
+                e:y="y*10" 
+                width="10" 
+                height="10"
+                fill="rgb({(x+y)/20*255}, 0, 0)"
+            />
+        </re:repeat>
+    </re:repeat>
+</svg>

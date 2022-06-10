@@ -1,0 +1,18 @@
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:re="http://oss.kotw.dev/resvg"
+    xmlns:shape="shapelib"
+    width="100"
+    height="100"
+>
+    <re:include path="shapelib.rsvg" />
+
+    <rect width="100" height="100" x="0" y="0" fill="#ff8800"/>
+    <re:path fill="rgba(0, 0, 0, 1)" stroke="rgba(0, 0, 0, 0.5)" stroke-width="5">
+        <shape:square re:a="100" re:x="0" re:y="0"/>
+        <shape:circle re:x="70" re:y="50" re:r="25"/>
+        <shape:circle re:x="30" re:y="50" re:r="25"/>
+        <shape:circle re:y="70" re:x="50" re:r="25"/>
+        <shape:circle re:y="30" re:x="50" re:r="25"/>
+    </re:path>
+</svg>

@@ -1,4 +1,4 @@
-# Created on Thu May 26 2022
+# Created on Sat May 28 2022
 #
 # Copyright (c) 2022 KotwOSS
 
@@ -10,7 +10,7 @@ import transform
 
 class Transformer(ABC):
     transform: "transform.Transform"
-    data: "transform.Datacontainer"
+    data: "transform.Data"
 
     def __init__(self, transform: transform.Transform):
         self.transform = transform

@@ -2,11 +2,14 @@
 #
 # Copyright (c) 2022 KotwOSS
 
+import logging
 from component import Component
-from statement import SafeStatement
+from evaluator import SafeStatement
 
 
 class Run(Component):
     def run(self):
+        logging.debug("run codeblock")
+        
         SafeStatement(self.el.text, self.transform.vars).exec()
         self.destroy()
